@@ -1,6 +1,6 @@
 package com.app.senseaid
 
-import android.content.res.Resources
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -26,7 +26,14 @@ class MainActivity : AppCompatActivity() {
         val recyclerView: RecyclerView = findViewById(R.id.recycler_view)
         recyclerView.layoutManager = LinearLayoutManager(this)
 
-        val adaptor = DataAdaptor(loadLocations())
+        val adaptor = DataAdaptor(loadLocations()) { item ->
+            val intent = Intent(this, LocationActivity::class.java)
+            val bundle = Bundle()
+            intent.putExtra("locationData", item)
+//            bundle.putString("locationTitle", item.title)
+//            intent.putExtras(bundle)
+            startActivity(intent)
+        }
         recyclerView.adapter = adaptor
 
     }
