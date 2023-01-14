@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "1003138470499",
+    "project_id": "senseaid-895bb",
+    "storage_bucket": "senseaid-895bb.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1003138470499:android:a357e0ae193fa3cbb09e56",
+        "android_client_info": {
+          "package_name": "com.app.senseaid"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1003138470499-km8ftn5ft4agdh6dgtb5g6lkjqhq9ia2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAfMv8HaHS8lTKaCIAkP5f6Vb5vejDE0Wg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1003138470499-km8ftn5ft4agdh6dgtb5g6lkjqhq9ia2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
