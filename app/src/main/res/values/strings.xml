@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">SenseAid</string>
+    <string name="star_rate">Star icon</string>
 </resources>

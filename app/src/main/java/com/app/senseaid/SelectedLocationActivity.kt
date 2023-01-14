@@ -7,6 +7,7 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import com.app.senseaid.ui.theme.SenseAidTheme
 
 class SelectedLocationActivity : ComponentActivity() {
@@ -19,8 +20,7 @@ class SelectedLocationActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             SenseAidTheme {
-                Text(text = "Hello World!")
-                Log.d("Activity 2", location.title)
+                LocationScreen(location = location)
             }
         }
     }

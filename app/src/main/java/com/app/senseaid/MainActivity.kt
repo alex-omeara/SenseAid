@@ -40,7 +40,8 @@ class MainActivity : ComponentActivity() {
                     locList.addAll(r.documents.map { loc ->
                         Location(
                             loc.get("title").toString(),
-                            requestFirebaseStorageData(loc.get("imgPath").toString()).path
+                            requestFirebaseStorageData(loc.get("imgPath").toString()).path,
+                            loc.get("imgDesc").toString()
                         )
                     })
                 }
@@ -86,7 +87,7 @@ fun LocationCard(loc: Location, navToLocation: (Location) -> Unit) {
             Log.d("Glide", loc.img)
             GlideImage(
                 model = Firebase.storage.getReference(loc.img),
-                contentDescription = "Description",
+                contentDescription = loc.imgDescription,
                 contentScale = ContentScale.FillWidth,
                 modifier = Modifier
                     .height(170.dp)
