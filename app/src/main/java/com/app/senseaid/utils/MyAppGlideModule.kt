@@ -1,4 +1,4 @@
-package com.app.senseaid
+package com.app.senseaid.utils
 
 import android.content.Context
 import com.bumptech.glide.Glide
