@@ -1,6 +1,5 @@
 package com.app.senseaid
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -17,7 +16,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.app.senseaid.domain.model.Location
 import com.app.senseaid.domain.model.Response.*
 import com.app.senseaid.domain.repository.Locations
-import com.app.senseaid.presentation.location.LocationViewModel
+import com.app.senseaid.screens.home.HomeViewModel
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.google.firebase.ktx.Firebase
@@ -26,8 +25,8 @@ import com.google.firebase.storage.ktx.storage
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LocationScreen(
-    viewModel: LocationViewModel = hiltViewModel(),
+fun HomeScreen(
+    viewModel: HomeViewModel = hiltViewModel()
 ) {
 
 //    val scrollState = rememberScrollState()
@@ -65,7 +64,7 @@ fun LocationsContent(paddingValues: PaddingValues, locations: Locations) {
 
 @Composable
 fun Locations(
-    viewModel: LocationViewModel = hiltViewModel(),
+    viewModel: HomeViewModel = hiltViewModel(),
     locationsContent: @Composable (books: Locations) -> Unit
 ) {
     when(val locationResponse = viewModel.locationsResponse) {
@@ -119,6 +118,7 @@ fun LocationTitle(title: String) {
         fontWeight = FontWeight.Bold,
         textAlign = TextAlign.Center
     )
+
 }
 
 

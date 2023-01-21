@@ -1,4 +1,4 @@
-package com.app.senseaid.presentation.location
+package com.app.senseaid.screens.home
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class LocationViewModel @Inject constructor(
+class HomeViewModel @Inject constructor(
     private val repository: FirestoreRepository
 ) : ViewModel() {
     var locationsResponse by mutableStateOf<LocationsResponse>(Loading)
