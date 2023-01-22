@@ -1,22 +1,23 @@
 package com.app.senseaid.screens.home
 
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.app.senseaid.domain.model.Location
-import com.app.senseaid.domain.model.Response.Loading
 import com.app.senseaid.domain.repository.FirestoreRepository
-import com.app.senseaid.domain.repository.LocationsResponse
+import com.app.senseaid.domain.repository.StorageRepository
+import com.app.senseaid.screens.SenseAidViewModel
+import com.google.firebase.storage.StorageReference
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    repository: FirestoreRepository
-) : ViewModel() {
+    firestoreRepository: FirestoreRepository,
+    val storageRepository: StorageRepository
+    ) : SenseAidViewModel() {
 
-    val locations = repository.locations
+    val locations = firestoreRepository.locations
+
+    fun getLocationImage(imgPath: String) = storageRepository.getFileFromStorage(imgPath)
 }

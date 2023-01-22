@@ -81,17 +81,17 @@ fun LocationCard(location: Location, viewModel: HomeViewModel, onLocationClicked
                 .fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            LocationImage(img = location.imgPath, imgDesc = location.imgDesc)
-            LocationTitle(title = location.title)
+            LocationImage(location.imgPath, location.imgDesc, viewModel)
+            LocationTitle(location.title)
         }
     }
 }
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun LocationImage(img: String, imgDesc: String) {
+fun LocationImage(img: String, imgDesc: String, viewModel: HomeViewModel) {
     GlideImage(
-        model = Firebase.storage.getReference(img),
+        model = viewModel.getLocationImage(img),
         contentDescription = imgDesc,
         modifier = Modifier
             .fillMaxWidth(),
