@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.app.senseaid.domain.model.Location
 import com.app.senseaid.domain.model.Response.Loading
 import com.app.senseaid.domain.repository.FirestoreRepository
 import com.app.senseaid.domain.repository.LocationsResponse

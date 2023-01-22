@@ -1,4 +1,4 @@
-package com.app.senseaid
+package com.app.senseaid.screens.home
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -13,10 +13,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.app.senseaid.Routes.LOCATION_ID
+import com.app.senseaid.Routes.LOCATION_SCREEN
 import com.app.senseaid.domain.model.Location
 import com.app.senseaid.domain.model.Response.*
 import com.app.senseaid.domain.repository.Locations
-import com.app.senseaid.screens.home.HomeViewModel
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.google.firebase.ktx.Firebase
@@ -26,7 +27,8 @@ import com.google.firebase.storage.ktx.storage
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    viewModel: HomeViewModel = hiltViewModel()
+    viewModel: HomeViewModel = hiltViewModel(),
+    onLocationClicked: (String) -> Unit
 ) {
 
 //    val scrollState = rememberScrollState()
@@ -37,7 +39,9 @@ fun HomeScreen(
                 locationsContent = { locations ->
                     LocationsContent(
                         paddingValues = paddingValues,
-                        locations = locations
+                        viewModel = viewModel,
+                        locations = locations,
+                        onLocationClicked = onLocationClicked
                     )
                 }
             )
@@ -45,21 +49,6 @@ fun HomeScreen(
     )
 }
 
-@Composable
-fun LocationsContent(paddingValues: PaddingValues, locations: Locations) {
-    LazyColumn(modifier = Modifier
-        .fillMaxSize()
-        .padding(paddingValues)) {
-        items(
-            items = locations
-        ) { location ->
-            LocationCard(
-                location = location,
-                null
-            )
-        }
-    }
-}
 
 
 @Composable
@@ -73,20 +62,38 @@ fun Locations(
         is Failure -> print(locationResponse.e)
     }
 }
+
 @Composable
-fun LocationCard(location: Location, navToLocation: ((Location) -> Unit)?) {
+fun LocationsContent(paddingValues: PaddingValues, locations: Locations, viewModel: HomeViewModel, onLocationClicked: (String) -> Unit) {
+    LazyColumn(modifier = Modifier
+        .fillMaxSize()
+        .padding(paddingValues)) {
+        items(
+            items = locations
+        ) { location ->
+            LocationCard(
+                location = location,
+                viewModel = viewModel,
+                onLocationClicked = onLocationClicked
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun LocationCard(location: Location, viewModel: HomeViewModel, onLocationClicked: (String) -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 6.dp),
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-
+        onClick = { onLocationClicked("$LOCATION_SCREEN?$LOCATION_ID={${location.id}}") }
         ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth(),
-//                .clickable { navToLocation(location) },
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             LocationImage(img = location.imgPath, imgDesc = location.imgDesc)
