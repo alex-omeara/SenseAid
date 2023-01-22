@@ -9,7 +9,7 @@ typealias LocationsResponse = Response<Locations>
 typealias AddLocationResponse = Response<Boolean>
 
 interface FirestoreRepository {
-    suspend fun getLocationsFromFirestore(): Flow<LocationsResponse>
+    val locations: Flow<List<Location>>
 
     suspend fun addLocationToFirestore(title: String, img: String, imgDescription: String): AddLocationResponse
 

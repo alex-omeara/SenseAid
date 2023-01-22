@@ -6,8 +6,10 @@ import com.app.senseaid.domain.model.Response.Success
 import com.app.senseaid.domain.repository.AddLocationResponse
 import com.app.senseaid.domain.repository.FirestoreRepository
 import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.flow.callbackFlow
+import com.google.firebase.firestore.ktx.snapshots
+import com.google.firebase.firestore.ktx.toObjects
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
@@ -15,18 +17,9 @@ class FirestoreRepositoryImpl @Inject constructor(
     private val firestore: FirebaseFirestore
 ): FirestoreRepository {
 
-    override suspend fun getLocationsFromFirestore() = callbackFlow {
-        val snapshotListener = FirebaseFirestore.getInstance().collection(LOCATION_COLLECTION).addSnapshotListener { snapshot, e ->
-            val response = if (snapshot != null) {
-                val locations = snapshot.toObjects(Location::class.java)
-                Success(locations)
-            } else {
-                Failure(e)
-            }
-            trySend(response)
-        }
-        awaitClose { snapshotListener.remove() }
-    }
+    override val locations: Flow<List<Location>>
+        get() =
+            firestore.collection(LOCATION_COLLECTION).snapshots().map { snapshot -> snapshot.toObjects() }
 
     override suspend fun addLocationToFirestore(title: String, img: String, imgDescription: String): AddLocationResponse {
         return try {

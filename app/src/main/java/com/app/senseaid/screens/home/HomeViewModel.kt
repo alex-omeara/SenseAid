@@ -15,20 +15,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val repository: FirestoreRepository
+    repository: FirestoreRepository
 ) : ViewModel() {
-    var locationsResponse by mutableStateOf<LocationsResponse>(Loading)
-        private set
 
-    init {
-        getLocations()
-    }
-
-    private fun getLocations() {
-        viewModelScope.launch {
-            repository.getLocationsFromFirestore().collect {
-                locationsResponse = it
-            }
-        }
-    }
+    val locations = repository.locations
 }

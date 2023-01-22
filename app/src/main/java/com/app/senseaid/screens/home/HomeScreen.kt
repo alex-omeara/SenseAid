@@ -1,11 +1,13 @@
 package com.app.senseaid.screens.home
 
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -13,11 +15,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.app.senseaid.Routes.LOCATION_ID
 import com.app.senseaid.Routes.LOCATION_SCREEN
 import com.app.senseaid.domain.model.Location
 import com.app.senseaid.domain.model.Response.*
-import com.app.senseaid.domain.repository.Locations
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.google.firebase.ktx.Firebase
@@ -33,44 +35,27 @@ fun HomeScreen(
 
 //    val scrollState = rememberScrollState()
 
-    Scaffold(
-        content = { paddingValues ->
-            Locations(
-                locationsContent = { locations ->
-                    LocationsContent(
-                        paddingValues = paddingValues,
-                        viewModel = viewModel,
-                        locations = locations,
-                        onLocationClicked = onLocationClicked
-                    )
-                }
-            )
-        }
-    )
-}
-
-
-
-@Composable
-fun Locations(
-    viewModel: HomeViewModel = hiltViewModel(),
-    locationsContent: @Composable (books: Locations) -> Unit
-) {
-    when(val locationResponse = viewModel.locationsResponse) {
-        is Loading -> Unit
-        is Success -> locationsContent(locationResponse.data)
-        is Failure -> print(locationResponse.e)
+    Scaffold { paddingValues ->
+        val locations = viewModel.locations.collectAsStateWithLifecycle(emptyList())
+        LocationsContent(
+            paddingValues = paddingValues,
+            locations = locations,
+            viewModel = viewModel,
+            onLocationClicked = onLocationClicked
+        )
     }
 }
 
 @Composable
-fun LocationsContent(paddingValues: PaddingValues, locations: Locations, viewModel: HomeViewModel, onLocationClicked: (String) -> Unit) {
+fun LocationsContent(paddingValues: PaddingValues, locations: State<List<Location>>, viewModel: HomeViewModel, onLocationClicked: (String) -> Unit) {
     LazyColumn(modifier = Modifier
         .fillMaxSize()
         .padding(paddingValues)) {
         items(
-            items = locations
+            items = locations.value,
+//            key = { it.id }
         ) { location ->
+            Log.i("LOCATION", location.id)
             LocationCard(
                 location = location,
                 viewModel = viewModel,
