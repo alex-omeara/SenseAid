@@ -21,7 +21,10 @@ class FirestoreRepositoryImpl @Inject constructor(
         get() =
             firestore.collection(LOCATION_COLLECTION).snapshots().map { snapshot -> snapshot.toObjects() }
 
-    override suspend fun addLocationToFirestore(title: String, img: String, imgDescription: String): AddLocationResponse {
+    override suspend fun getLocation(uid: String): Location? =
+        firestore.collection(LOCATION_COLLECTION).document(uid).get().await().toObject(Location::class.java)
+
+    override suspend fun addLocation(title: String, img: String, imgDescription: String): AddLocationResponse {
         return try {
             val locationId = FirebaseFirestore.getInstance().collection(LOCATION_COLLECTION).document().id
             val location = Location(
@@ -36,6 +39,7 @@ class FirestoreRepositoryImpl @Inject constructor(
             Failure(e)
         }
     }
+
 
     companion object {
         private const val LOCATION_COLLECTION = "locations"

@@ -1,18 +1,54 @@
 package com.app.senseaid.screens.location
 
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.app.senseaid.domain.model.Location
-import com.app.senseaid.screens.home.HomeViewModel
+import com.app.senseaid.R
+import com.app.senseaid.screens.common.composable.TextTitle
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import com.bumptech.glide.integration.compose.GlideImage
 
+@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun LocationScreen(
     onSomethingClicked: () -> Unit,
     locationId: String,
     modifier: Modifier = Modifier,
-    viewModel: HomeViewModel = hiltViewModel()
+    viewModel: LocationViewModel = hiltViewModel()
 ) {
-    Text(text = "Hello World")
+    val location by viewModel.location
+    LaunchedEffect(Unit) { viewModel.initialise(locationId) }
+    
+    Column(
+        modifier = modifier.fillMaxSize()
+    ) {
+        GlideImage(
+            model = viewModel.getLocationImage(location.imgPath),
+            contentDescription = location.imgDesc,
+        )
+        TextTitle(title = location.title)
+        RatingBar()
+    }
+}
+
+@Composable
+fun RatingBar() {
+    Row() {
+        Icon(
+            painter = painterResource(id = R.drawable.round_star_rate_24),
+            contentDescription = "star",
+            tint = Color.Unspecified
+        )
+        Text(text = "3.6 (28)")
+    }
+    
 }

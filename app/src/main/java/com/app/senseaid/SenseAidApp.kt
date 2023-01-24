@@ -56,7 +56,7 @@ fun rememberAppState(
 ) = remember(navController,coroutineScope) { SenseAidAppState(navController, coroutineScope) }
 
 fun NavGraphBuilder.senseAidGraph(navController: NavHostController) {
-    composable(Routes.HOME_SCREEN) {
+    composable(HOME_SCREEN) {
         HomeScreen(
             onLocationClicked = { route -> navController.navigate(route) }
 
