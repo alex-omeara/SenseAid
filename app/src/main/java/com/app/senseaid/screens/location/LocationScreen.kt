@@ -1,8 +1,6 @@
 package com.app.senseaid.screens.location
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -11,6 +9,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.app.senseaid.R
 import com.app.senseaid.screens.common.composable.TextTitle
@@ -36,19 +35,25 @@ fun LocationScreen(
             contentDescription = location.imgDesc,
         )
         TextTitle(title = location.title)
-        RatingBar()
+        RatingBar(modifier)
     }
 }
 
 @Composable
-fun RatingBar() {
-    Row() {
+fun RatingBar(modifier: Modifier = Modifier) {
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceEvenly
+    ) {
         Icon(
             painter = painterResource(id = R.drawable.round_star_rate_24),
             contentDescription = "star",
             tint = Color.Unspecified
         )
         Text(text = "3.6 (28)")
+        Text(text = "Bright Lights")
+        Text(text = "Low Sound")
+
     }
     
 }

@@ -34,6 +34,7 @@ import com.google.firebase.ktx.Firebase
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
+    modifier: Modifier = Modifier,
     onLocationClicked: (String) -> Unit
 ) {
 
@@ -42,14 +43,16 @@ fun HomeScreen(
     Scaffold { paddingValues ->
         val locations = viewModel.locations.collectAsStateWithLifecycle(emptyList())
 
-        LazyColumn(modifier = Modifier
+        LazyColumn(modifier = modifier
             .fillMaxSize()
-            .padding(paddingValues)) {
+            .padding(paddingValues)
+        ) {
             items(
                 items = locations.value,
                 key = { it.id }
             ) { locationItem ->
                 LocationItem(
+                    modifier = modifier,
                     location = locationItem,
                     onLocationClicked = onLocationClicked
                 )

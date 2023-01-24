@@ -17,10 +17,10 @@ abstract class SenseAidViewModel : ViewModel() {
     fun launchCatching(snackbar: Boolean = false, block: suspend CoroutineScope.() -> Unit) =
         viewModelScope.launch(block = block)
 
-    fun getLocationImage(imgPath: String): StorageReference {
+    fun getLocationImage(imgPath: String): StorageReference =
         if (imgPath == "") {
-            return storageRepository.getFileFromStorage("placeholder-image.jpg")
+            storageRepository.getFileFromStorage("placeholder-image.jpg")
+        } else {
+            storageRepository.getFileFromStorage(imgPath)
         }
-        return storageRepository.getFileFromStorage(imgPath)
-    }
 }

@@ -22,31 +22,28 @@ import com.bumptech.glide.integration.compose.GlideImage
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalGlideComposeApi::class)
 @Composable
 fun LocationItem(
+    modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel(),
     location: Location,
     onLocationClicked: (String) -> Unit
 ) {
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 6.dp),
+        modifier = modifier.padding(vertical = 6.dp),
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         onClick = { onLocationClicked("${Routes.LOCATION_SCREEN}?${Routes.LOCATION_ID}={${location.id}}") }
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth(),
+            modifier = modifier,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             GlideImage(
                 model = viewModel.getLocationImage(location.imgPath),
                 contentDescription = location.imgDesc,
-                modifier = Modifier
-                    .fillMaxWidth(),
+                modifier = modifier,
                 contentScale = ContentScale.FillWidth
             )
-            TextTitle(location.title)
+            TextTitle(title = location.title)
         }
     }
 }
