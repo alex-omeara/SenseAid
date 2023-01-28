@@ -9,7 +9,8 @@ data class Location(
     val id: String = "",
     val title: String = "",
     val imgPath: String = "",
-    val imgDesc: String = ""
+    val imgDesc: String = "",
+    val avgRating: Double? = null
     ) {
 
 

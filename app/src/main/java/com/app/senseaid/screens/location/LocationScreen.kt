@@ -35,12 +35,12 @@ fun LocationScreen(
             contentDescription = location.imgDesc,
         )
         TextTitle(title = location.title)
-        RatingBar(modifier)
+        RatingBar(modifier, location.avgRating ?: -1.0)
     }
 }
 
 @Composable
-fun RatingBar(modifier: Modifier = Modifier) {
+fun RatingBar(modifier: Modifier = Modifier, averageRating: Double) {
     Row(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceEvenly
