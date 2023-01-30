@@ -21,5 +21,14 @@ fun TextTitle(modifier: Modifier = Modifier, title: String) {
         fontWeight = FontWeight.Bold,
         textAlign = TextAlign.Center
     )
+}
 
+@Composable
+fun SmallTextTitle(modifier: Modifier = Modifier, title: String) {
+    Text(
+        text = title,
+        modifier = modifier
+            .padding(vertical = 5.dp),
+        style = MaterialTheme.typography.titleSmall
+    )
 }

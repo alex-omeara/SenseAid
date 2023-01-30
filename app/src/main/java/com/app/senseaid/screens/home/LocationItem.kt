@@ -1,7 +1,6 @@
 package com.app.senseaid.screens.home
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
@@ -14,6 +13,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.app.senseaid.Routes
+import com.app.senseaid.Routes.LOCATION_ID
+import com.app.senseaid.Routes.LOCATION_SCREEN
 import com.app.senseaid.domain.model.Location
 import com.app.senseaid.screens.common.composable.TextTitle
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
@@ -31,7 +32,7 @@ fun LocationItem(
         modifier = modifier.padding(vertical = 6.dp),
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        onClick = { onLocationClicked("${Routes.LOCATION_SCREEN}?${Routes.LOCATION_ID}={${location.id}}") }
+        onClick = { onLocationClicked("${LOCATION_SCREEN}?${LOCATION_ID}={${location.id}}") }
     ) {
         Column(
             modifier = modifier,
