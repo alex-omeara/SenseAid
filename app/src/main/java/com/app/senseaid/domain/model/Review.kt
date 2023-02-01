@@ -5,15 +5,15 @@ import com.google.gson.annotations.SerializedName
 
 data class Review(
     @DocumentId
-    var id: String = "",
+    val id: String = "",
     @SerializedName("title")
-    var title: String = "",
+    val title: String = "",
     @SerializedName("author")
-    var author: String = "",
+    val author: String = "",
     @SerializedName("rating")
-    var rating: Double = 0.0,
+    val rating: Double = 0.0,
     @SerializedName("tags")
-    var tags: String = "",
+    val tags: String = "",
     @SerializedName("content")
-    var content: String = ""
+    val content: String = ""
 )

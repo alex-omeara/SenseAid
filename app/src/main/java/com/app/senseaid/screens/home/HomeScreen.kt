@@ -14,8 +14,8 @@ import com.app.senseaid.domain.model.Response.*
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    viewModel: HomeViewModel = hiltViewModel(),
     modifier: Modifier = Modifier,
+    viewModel: HomeViewModel = hiltViewModel(),
     onLocationClicked: (String) -> Unit
 ) {
 

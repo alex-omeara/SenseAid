@@ -5,8 +5,6 @@ import com.app.senseaid.domain.model.Response
 import com.app.senseaid.domain.model.Review
 import kotlinx.coroutines.flow.Flow
 
-typealias Locations = List<Location>
-typealias LocationsResponse = Response<Locations>
 typealias AddLocationResponse = Response<Boolean>
 
 interface FirestoreRepository {
@@ -14,7 +12,7 @@ interface FirestoreRepository {
 
     suspend fun getReviews(uid: String): Flow<List<Review>>
 
-//    suspend fun getReview(uid: String): Review?
+    suspend fun getReview(locationUid: String, reviewUid: String): Review?
 
     suspend fun getLocation(uid: String): Location?
 

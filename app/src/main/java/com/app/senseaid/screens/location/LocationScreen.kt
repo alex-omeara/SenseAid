@@ -53,7 +53,7 @@ fun LocationScreen(
                     reviewItem ->
                     ReviewItem(
                         review = reviewItem,
-                        locationId = locationId.substring(1, locationId.length - 1),
+                        locationId = location.id,
                         onReviewClicked = onReviewClicked
                     )
                 }
@@ -69,7 +69,7 @@ fun RatingBar(modifier: Modifier = Modifier, averageRating: Double) {
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
         Icon(
-            painter = painterResource(id = R.drawable.round_star_rate_24),
+            painter = painterResource(id = R.drawable.ic_round_star_24),
             contentDescription = "star",
             tint = Color.Unspecified
         )

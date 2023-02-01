@@ -14,7 +14,7 @@ import androidx.compose.ui.unit.dp
 fun TextTitle(modifier: Modifier = Modifier, title: String) {
     Text(
         text = title,
-        modifier = Modifier
+        modifier = modifier
             .padding(vertical = 5.dp)
             .fillMaxWidth(),
         style = MaterialTheme.typography.titleLarge,

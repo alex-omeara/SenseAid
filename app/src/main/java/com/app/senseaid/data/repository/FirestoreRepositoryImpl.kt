@@ -1,6 +1,5 @@
 package com.app.senseaid.data.repository
 
-import android.util.Log
 import com.app.senseaid.domain.model.Location
 import com.app.senseaid.domain.model.Response.Failure
 import com.app.senseaid.domain.model.Response.Success
@@ -9,6 +8,7 @@ import com.app.senseaid.domain.repository.AddLocationResponse
 import com.app.senseaid.domain.repository.FirestoreRepository
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.snapshots
+import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.firestore.ktx.toObjects
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -31,13 +31,13 @@ class FirestoreRepositoryImpl @Inject constructor(
                 snapshot.toObjects()
             }
 
-//    override suspend fun getReview(uid: String): Review? {
-////        firestore.collection()
-//    }
+    override suspend fun getReview(locationUid: String, reviewUid: String): Review? =
+        firestore.collection(LOCATIONS_COLLECTION).document(locationUid)
+            .collection(REVIEWS_COLLECTIONS).document(reviewUid).get().await().toObject<Review>()
 
     override suspend fun getLocation(uid: String): Location? =
         firestore.collection(LOCATIONS_COLLECTION).document(uid).get().await()
-            .toObject(Location::class.java)
+            .toObject<Location>()
 
     override suspend fun addLocation(
         title: String,
