@@ -11,7 +11,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun TextTitle(modifier: Modifier = Modifier, title: String) {
+fun TextTitle(
+    modifier: Modifier = Modifier,
+    title: String,
+    textAlign: TextAlign? = null
+) {
     Text(
         text = title,
         modifier = modifier
@@ -19,7 +23,7 @@ fun TextTitle(modifier: Modifier = Modifier, title: String) {
             .fillMaxWidth(),
         style = MaterialTheme.typography.titleLarge,
         fontWeight = FontWeight.Bold,
-        textAlign = TextAlign.Center
+        textAlign = textAlign
     )
 }
 

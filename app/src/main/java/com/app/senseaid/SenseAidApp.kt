@@ -88,6 +88,7 @@ fun NavGraphBuilder.senseAidGraph(navController: NavHostController) {
         )
     ) {
         ReviewScreen(
+
             locationId = it.arguments?.getString(LOCATION_ID) ?: DEFAULT_ID,
             reviewId = it.arguments?.getString(REVIEW_ID) ?: DEFAULT_ID
         )
