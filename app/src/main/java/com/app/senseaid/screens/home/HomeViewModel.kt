@@ -2,6 +2,7 @@ package com.app.senseaid.screens.home
 
 import android.content.Context
 import android.util.Log
+import com.app.senseaid.Routes
 import com.app.senseaid.domain.model.Review
 import com.app.senseaid.domain.repository.FirestoreRepository
 import com.app.senseaid.screens.SenseAidViewModel
@@ -18,6 +19,10 @@ class HomeViewModel @Inject constructor(
 ) : SenseAidViewModel() {
 
     val locations = firestoreRepository.locations
+
+    fun onLocationPress(locationId: String, navToScreen: (String) -> Unit) {
+        navToScreen("${Routes.LOCATION_SCREEN}?${Routes.LOCATION_ID}={${locationId}}")
+    }
 
     // TODO: Delete or improve
     fun addData(context: Context) {

@@ -13,6 +13,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.app.senseaid.Routes.ADD_REVIEW_SCREEN
 import com.app.senseaid.Routes.HOME_SCREEN
 import com.app.senseaid.Routes.LOCATION_SCREEN
 import com.app.senseaid.Routes.DEFAULT_ID
@@ -21,6 +22,7 @@ import com.app.senseaid.Routes.LOCATION_ID_ARG
 import com.app.senseaid.Routes.REVIEW_ID
 import com.app.senseaid.Routes.REVIEW_ID_ARG
 import com.app.senseaid.Routes.REVIEW_SCREEN
+import com.app.senseaid.screens.add_review.AddReviewScreen
 import com.app.senseaid.screens.home.HomeScreen
 import com.app.senseaid.screens.location.LocationScreen
 import com.app.senseaid.screens.review.ReviewScreen
@@ -36,6 +38,7 @@ object Routes {
     const val REVIEW_SCREEN = "review"
     const val REVIEW_ID = "reviewId"
     const val REVIEW_ID_ARG = "$REVIEW_ID={$REVIEW_ID}"
+    const val ADD_REVIEW_SCREEN = "addReview"
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -64,7 +67,7 @@ fun rememberAppState(
 fun NavGraphBuilder.senseAidGraph(navController: NavHostController) {
     composable(HOME_SCREEN) {
         HomeScreen(
-            onLocationClicked = { route -> navController.navigate(route) }
+            onLocationPress = { route -> navController.navigate(route) }
         )
     }
 
@@ -74,8 +77,9 @@ fun NavGraphBuilder.senseAidGraph(navController: NavHostController) {
     ) {
         LocationScreen(
             locationId = it.arguments?.getString(LOCATION_ID) ?: DEFAULT_ID,
-            onReviewClicked = { route -> navController.navigate(route) },
-            onBackPress = { navController.popBackStack() }
+            onReviewPress = { route -> navController.navigate(route) },
+            onBackPress = { navController.popBackStack() },
+            onAddReviewPress = { route -> navController.navigate(route) }
         )
     }
 
@@ -90,6 +94,16 @@ fun NavGraphBuilder.senseAidGraph(navController: NavHostController) {
             locationId = it.arguments?.getString(LOCATION_ID) ?: DEFAULT_ID,
             reviewId = it.arguments?.getString(REVIEW_ID) ?: DEFAULT_ID,
             onBackPress = { navController.popBackStack() }
+        )
+    }
+
+    composable(
+        route = "$ADD_REVIEW_SCREEN$LOCATION_ID_ARG",
+        arguments = listOf(navArgument(LOCATION_ID) { defaultValue = DEFAULT_ID })
+    ) {
+        AddReviewScreen(
+            locationId = it.arguments?.getString(LOCATION_ID) ?: DEFAULT_ID,
+            onButtonPress = { navController.popBackStack() }
         )
     }
 }

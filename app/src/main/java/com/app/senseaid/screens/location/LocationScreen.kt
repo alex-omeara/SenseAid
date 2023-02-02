@@ -23,14 +23,15 @@ import com.app.senseaid.screens.common.composable.LocationImage
 import com.app.senseaid.screens.common.composable.TextTitle
 import com.app.senseaid.screens.review.ReviewItem
 
-@OptIn( ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LocationScreen(
     modifier: Modifier = Modifier,
     locationId: String,
     viewModel: LocationViewModel = hiltViewModel(),
-    onReviewClicked: (String) -> Unit,
-    onBackPress: () -> Unit
+    onReviewPress: (String) -> Unit,
+    onBackPress: () -> Unit,
+    onAddReviewPress: (String) -> Unit
 ) {
     val location by viewModel.location
 
@@ -54,7 +55,7 @@ fun LocationScreen(
         floatingActionButtonPosition = FabPosition.End,
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { Log.i("Add Review", "Add review press") },
+                onClick = { viewModel.onAddReview(location.id, onAddReviewPress) },
                 shape = CircleShape,
                 containerColor = Color.Cyan
             ) {
@@ -88,8 +89,8 @@ fun LocationScreen(
                 ) { reviewItem ->
                     ReviewItem(
                         review = reviewItem,
-                        locationId = location.id,
-                        onReviewClicked = onReviewClicked,
+                        onReviewPress = onReviewPress,
+                        locationId = location.id
                     )
                 }
             }
@@ -121,17 +122,19 @@ fun RatingBar(
             Text(text = "$averageRating ($totalReviews)")
         }
         if (topTags.isNotEmpty()) {
-            Divider(modifier = modifier
-                .fillMaxHeight()
-                .width(1.dp)
+            Divider(
+                modifier = modifier
+                    .fillMaxHeight()
+                    .width(1.dp)
             )
             Text(
                 text = topTags[0],
                 textAlign = TextAlign.Center
             )
-            Divider(modifier = modifier
-                .fillMaxHeight()
-                .width(1.dp)
+            Divider(
+                modifier = modifier
+                    .fillMaxHeight()
+                    .width(1.dp)
             )
             Text(
                 text = topTags[1],

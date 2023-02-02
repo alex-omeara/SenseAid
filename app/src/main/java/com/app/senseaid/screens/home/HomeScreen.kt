@@ -19,7 +19,7 @@ import com.app.senseaid.domain.model.Response.*
 fun HomeScreen(
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel(),
-    onLocationClicked: (String) -> Unit
+    onLocationPress: (String) -> Unit
 ) {
     Scaffold(
         topBar = {
@@ -50,7 +50,7 @@ fun HomeScreen(
                 LocationItem(
                     modifier = modifier,
                     location = locationItem,
-                    onLocationClicked = onLocationClicked
+                    onLocationPress = onLocationPress
                 )
             }
         }

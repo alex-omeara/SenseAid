@@ -4,4 +4,6 @@
     <string name="star_desc">Star</string>
     <string name="back_button">Back button</string>
     <string name="add_review">Add review</string>
+    <string name="add_review_title">Leave your review</string>
+    <string name="cancel">Cancel review</string>
 </resources>

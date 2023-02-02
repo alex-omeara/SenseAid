@@ -11,25 +11,25 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.app.senseaid.Routes.LOCATION_ID
-import com.app.senseaid.Routes.REVIEW_ID
-import com.app.senseaid.Routes.REVIEW_SCREEN
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.app.senseaid.domain.model.Review
 import com.app.senseaid.screens.common.composable.SmallTextTitle
+import com.app.senseaid.screens.location.LocationViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReviewItem(
     modifier: Modifier = Modifier,
+    viewModel: LocationViewModel = hiltViewModel(),
     review: Review,
     locationId: String,
-    onReviewClicked: (String) -> Unit
+    onReviewPress: (String) -> Unit
 ) {
     Card( // TODO: Make into expandable card?
         modifier = modifier,
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        onClick = { onReviewClicked("${REVIEW_SCREEN}?${LOCATION_ID}={${locationId}}&${REVIEW_ID}={${review.id}}") }
+        onClick = { viewModel.onReviewPress(locationId, review.id, onReviewPress) }
     ) {
         Row() { // TODO: add profile image
             Column() {

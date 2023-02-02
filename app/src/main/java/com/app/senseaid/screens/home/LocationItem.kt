@@ -13,8 +13,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.app.senseaid.Routes.LOCATION_ID
-import com.app.senseaid.Routes.LOCATION_SCREEN
 import com.app.senseaid.domain.model.Location
 import com.app.senseaid.screens.common.composable.LocationImage
 import com.app.senseaid.screens.common.composable.TextTitle
@@ -25,13 +23,13 @@ fun LocationItem(
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel(),
     location: Location,
-    onLocationClicked: (String) -> Unit
+    onLocationPress: (String) -> Unit
 ) {
     Card(
         modifier = modifier.padding(6.dp),
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        onClick = { onLocationClicked("${LOCATION_SCREEN}?${LOCATION_ID}={${location.id}}") }
+        onClick = { viewModel.onLocationPress(location.id, onLocationPress) }
     ) {
         Column(
             modifier = modifier,
