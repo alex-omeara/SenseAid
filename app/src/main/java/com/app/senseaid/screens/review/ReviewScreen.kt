@@ -2,8 +2,7 @@ package com.app.senseaid.screens.review
 
 import android.util.Log
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -11,8 +10,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.app.senseaid.R
@@ -21,53 +18,72 @@ import com.app.senseaid.screens.common.composable.TextTitle
 import kotlin.math.floor
 import kotlin.math.round
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReviewScreen(
     modifier: Modifier = Modifier,
+    viewModel: ReviewViewModel = hiltViewModel(),
     locationId: String,
     reviewId: String,
     review: Review = Review(),
-    viewModel: ReviewViewModel = hiltViewModel()
+    onBackPress: () -> Unit
 ) {
     Log.i("Review Screen", "locationId: $locationId, reviewId: $reviewId")
     val review by viewModel.review
 
     LaunchedEffect(Unit) { viewModel.initialise(locationId, reviewId) }
 
-    Column(modifier = modifier.padding(15.dp)) {
-        Text(
-            modifier = modifier.fillMaxWidth(),
-            text = review.author,
-            fontWeight = FontWeight.Bold
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {},
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Gray),
+                navigationIcon = {
+                    IconButton(onClick = onBackPress) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_baseline_arrow_back_24),
+                            contentDescription = R.string.back_button.toString()
+                        )
+                    }
+                }
+            )
+        }
+    ) { paddingValues ->
+        Column(modifier = modifier.padding(paddingValues)) {
+            Text(
+                modifier = modifier.fillMaxWidth(),
+                text = review.author,
+                fontWeight = FontWeight.Bold
 
-        )
-        TextTitle(title = review.title)
-        Row(
-            modifier = modifier.fillMaxWidth(),
-        ) {
-            repeat(floor(review.rating).toInt()) {
-                Icon(
-                    modifier = modifier.size(48.dp),
-                    painter = painterResource(id = R.drawable.ic_round_star_24),
-                    contentDescription = "star",
-                    tint = Color.Unspecified
-                )
-            }
-            if (review.rating % 1 != 0.0) {
-                val starsRemaining = round((review.rating - floor(review.rating)) * 2) / 2.0
-                if (starsRemaining != 0.0) {
-                    val starResourceId: Int =
-                        if (starsRemaining == 1.0) R.drawable.ic_round_star_24 else R.drawable.ic_round_star_half_24
+            )
+            TextTitle(title = review.title)
+            Row(
+                modifier = modifier.fillMaxWidth(),
+            ) {
+                repeat(floor(review.rating).toInt()) {
                     Icon(
                         modifier = modifier.size(48.dp),
-                        painter = painterResource(id = starResourceId),
-                        contentDescription = "star",
+                        painter = painterResource(id = R.drawable.ic_round_star_24),
+                        contentDescription = R.string.star_desc.toString(),
                         tint = Color.Unspecified
                     )
                 }
+                if (review.rating % 1 != 0.0) {
+                    val starsRemaining = round((review.rating - floor(review.rating)) * 2) / 2.0
+                    if (starsRemaining != 0.0) {
+                        val starResourceId: Int =
+                            if (starsRemaining == 1.0) R.drawable.ic_round_star_24 else R.drawable.ic_round_star_half_24
+                        Icon(
+                            modifier = modifier.size(48.dp),
+                            painter = painterResource(id = starResourceId),
+                            contentDescription = R.string.star_desc.toString(),
+                            tint = Color.Unspecified
+                        )
+                    }
+                }
             }
+            Text(modifier = modifier, text = review.content)
         }
-        Text(modifier = modifier, text = review.content)
     }
 }
 

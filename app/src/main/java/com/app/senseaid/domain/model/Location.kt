@@ -1,8 +1,6 @@
 package com.app.senseaid.domain.model
 
-import android.os.Parcelable
 import com.google.firebase.firestore.DocumentId
-import kotlinx.parcelize.Parcelize
 
 data class Location(
     @DocumentId
@@ -10,7 +8,8 @@ data class Location(
     val title: String = "",
     val imgPath: String = "",
     val imgDesc: String = "",
-    val avgRating: Double? = null
+    val avgRating: Double? = null,
+    val top_tags: List<String> = emptyList()
     ) {
 
 

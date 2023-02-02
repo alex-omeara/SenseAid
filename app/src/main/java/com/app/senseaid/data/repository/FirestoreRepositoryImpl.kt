@@ -27,9 +27,7 @@ class FirestoreRepositoryImpl @Inject constructor(
     override suspend fun getReviews(uid: String): Flow<List<Review>> =
         firestore.collection(LOCATIONS_COLLECTION).document(uid)
             .collection(REVIEWS_COLLECTIONS).snapshots()
-            .map { snapshot ->
-                snapshot.toObjects()
-            }
+            .map { snapshot -> snapshot.toObjects() }
 
     override suspend fun getReview(locationUid: String, reviewUid: String): Review? =
         firestore.collection(LOCATIONS_COLLECTION).document(locationUid)

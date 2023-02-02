@@ -65,7 +65,6 @@ fun NavGraphBuilder.senseAidGraph(navController: NavHostController) {
     composable(HOME_SCREEN) {
         HomeScreen(
             onLocationClicked = { route -> navController.navigate(route) }
-
         )
     }
 
@@ -74,9 +73,9 @@ fun NavGraphBuilder.senseAidGraph(navController: NavHostController) {
         arguments = listOf(navArgument(LOCATION_ID) { defaultValue = DEFAULT_ID })
     ) {
         LocationScreen(
-            //{ navController.popBackStack() } TODO: Implement
+            locationId = it.arguments?.getString(LOCATION_ID) ?: DEFAULT_ID,
             onReviewClicked = { route -> navController.navigate(route) },
-            locationId = it.arguments?.getString(LOCATION_ID) ?: DEFAULT_ID
+            onBackPress = { navController.popBackStack() }
         )
     }
 
@@ -88,9 +87,9 @@ fun NavGraphBuilder.senseAidGraph(navController: NavHostController) {
         )
     ) {
         ReviewScreen(
-
             locationId = it.arguments?.getString(LOCATION_ID) ?: DEFAULT_ID,
-            reviewId = it.arguments?.getString(REVIEW_ID) ?: DEFAULT_ID
+            reviewId = it.arguments?.getString(REVIEW_ID) ?: DEFAULT_ID,
+            onBackPress = { navController.popBackStack() }
         )
     }
 }

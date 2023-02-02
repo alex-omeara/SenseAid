@@ -6,8 +6,11 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.app.senseaid.R
 import com.app.senseaid.domain.model.Response.*
 
 
@@ -18,14 +21,27 @@ fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
     onLocationClicked: (String) -> Unit
 ) {
-
-//    val scrollState = rememberScrollState()
-
-    Scaffold { paddingValues ->
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {},
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Gray),
+                actions = {
+                    IconButton(onClick = { /*TODO*/ }) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_baseline_search_24),
+                            contentDescription = R.string.back_button.toString()
+                        )
+                    }
+                }
+            )
+        }
+    ) { paddingValues ->
         val locations = viewModel.locations.collectAsStateWithLifecycle(emptyList())
-        LazyColumn(modifier = modifier
-            .fillMaxSize()
-            .padding(paddingValues)
+
+        LazyColumn(
+            modifier = modifier
+                .padding(paddingValues)
         ) {
             items(
                 items = locations.value,

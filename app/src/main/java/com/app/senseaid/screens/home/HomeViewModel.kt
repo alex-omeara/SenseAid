@@ -1,25 +1,15 @@
 package com.app.senseaid.screens.home
 
 import android.content.Context
-import android.content.res.AssetManager
 import android.util.Log
-import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.viewModelScope
 import com.app.senseaid.domain.model.Review
 import com.app.senseaid.domain.repository.FirestoreRepository
 import com.app.senseaid.screens.SenseAidViewModel
-import com.google.firebase.firestore.FieldValue
-import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.firestore.ktx.snapshots
 import com.google.firebase.ktx.Firebase
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.flatMapConcat
-import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -46,7 +36,7 @@ class HomeViewModel @Inject constructor(
 
         Firebase.firestore.collection("locations").get().addOnSuccessListener { querySnapchot ->
             querySnapchot.documents.forEachIndexed { index, docSnapshot ->
-                var collectionReference = docSnapshot.reference.collection("reviews")
+                val collectionReference = docSnapshot.reference.collection("reviews")
                 for (i in c[index]) {
                     collectionReference.document().set(i)
                 }
