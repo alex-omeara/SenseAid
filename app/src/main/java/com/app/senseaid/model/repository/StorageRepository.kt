@@ -1,7 +1,6 @@
-package com.app.senseaid.domain.repository
+package com.app.senseaid.model.repository
 
 import com.google.firebase.storage.StorageReference
-import kotlinx.coroutines.flow.Flow
 
 
 interface StorageRepository {

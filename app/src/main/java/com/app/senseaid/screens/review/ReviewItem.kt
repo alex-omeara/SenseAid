@@ -12,8 +12,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.app.senseaid.domain.model.Review
-import com.app.senseaid.screens.common.composable.SmallTextTitle
+import com.app.senseaid.model.Review
+import com.app.senseaid.common.composable.SmallTextTitle
 import com.app.senseaid.screens.location.LocationViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -33,7 +33,7 @@ fun ReviewItem(
     ) {
         Row() { // TODO: add profile image
             Column() {
-                SmallTextTitle(title = review.title)
+                SmallTextTitle(modifier = modifier, text = review.title)
                 Text(text = review.rating.toString())
                 BasicText(text = review.content, softWrap = true)
             }

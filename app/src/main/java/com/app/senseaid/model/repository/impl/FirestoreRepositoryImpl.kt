@@ -1,11 +1,9 @@
-package com.app.senseaid.data.repository
+package com.app.senseaid.model.repository.impl
 
-import com.app.senseaid.domain.model.Location
-import com.app.senseaid.domain.model.Response.Failure
-import com.app.senseaid.domain.model.Response.Success
-import com.app.senseaid.domain.model.Review
-import com.app.senseaid.domain.repository.AddLocationResponse
-import com.app.senseaid.domain.repository.FirestoreRepository
+import com.app.senseaid.model.Location
+import com.app.senseaid.model.Review
+import com.app.senseaid.model.Tags
+import com.app.senseaid.model.repository.FirestoreRepository
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.snapshots
 import com.google.firebase.firestore.ktx.toObject
@@ -24,25 +22,30 @@ class FirestoreRepositoryImpl @Inject constructor(
             firestore.collection(LOCATIONS_COLLECTION).snapshots()
                 .map { snapshot -> snapshot.toObjects() }
 
-    override suspend fun getReviews(uid: String): Flow<List<Review>> =
-        firestore.collection(LOCATIONS_COLLECTION).document(uid)
+    override suspend fun getReviews(locationId: String): Flow<List<Review>> =
+        firestore.collection(LOCATIONS_COLLECTION).document(locationId)
             .collection(REVIEWS_COLLECTIONS).snapshots()
             .map { snapshot -> snapshot.toObjects() }
 
-    override suspend fun getReview(locationUid: String, reviewUid: String): Review? =
-        firestore.collection(LOCATIONS_COLLECTION).document(locationUid)
+    override suspend fun getReview(locationId: String, reviewUid: String): Review? =
+        firestore.collection(LOCATIONS_COLLECTION).document(locationId)
             .collection(REVIEWS_COLLECTIONS).document(reviewUid).get().await().toObject<Review>()
 
-    override suspend fun getLocation(uid: String): Location? =
-        firestore.collection(LOCATIONS_COLLECTION).document(uid).get().await()
+    override suspend fun addReview(review: Review, locationId: String) {
+        firestore.collection(LOCATIONS_COLLECTION).document(locationId)
+            .collection(REVIEWS_COLLECTIONS).document().set(review)
+    }
+
+    override suspend fun getLocation(locationId: String): Location? =
+        firestore.collection(LOCATIONS_COLLECTION).document(locationId).get().await()
             .toObject<Location>()
 
     override suspend fun addLocation(
         title: String,
         img: String,
         imgDescription: String
-    ): AddLocationResponse {
-        return try {
+    ) {
+        try {
             val locationId =
                 FirebaseFirestore.getInstance().collection(LOCATIONS_COLLECTION).document().id
             val location = Location(
@@ -53,9 +56,7 @@ class FirestoreRepositoryImpl @Inject constructor(
             )
             FirebaseFirestore.getInstance().collection("locations").document(locationId)
                 .set(location).await()
-            Success(true)
         } catch (e: Exception) {
-            Failure(e)
         }
     }
 

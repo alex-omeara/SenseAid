@@ -1,4 +1,4 @@
-package com.app.senseaid.data.module
+package com.app.senseaid.model.repository.module
 
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore

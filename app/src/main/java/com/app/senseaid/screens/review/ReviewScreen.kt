@@ -9,14 +9,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.app.senseaid.R
-import com.app.senseaid.domain.model.Review
-import com.app.senseaid.screens.common.composable.TextTitle
-import kotlin.math.floor
-import kotlin.math.round
+import com.app.senseaid.common.composable.TextTitle
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -25,7 +23,7 @@ fun ReviewScreen(
     viewModel: ReviewViewModel = hiltViewModel(),
     locationId: String,
     reviewId: String,
-    review: Review = Review(),
+//    review: Review = Review(),
     onBackPress: () -> Unit
 ) {
     Log.i("Review Screen", "locationId: $locationId, reviewId: $reviewId")
@@ -42,7 +40,7 @@ fun ReviewScreen(
                     IconButton(onClick = onBackPress) {
                         Icon(
                             painter = painterResource(id = R.drawable.ic_baseline_arrow_back_24),
-                            contentDescription = R.string.back_button.toString()
+                            contentDescription = stringResource(R.string.back_button)
                         )
                     }
                 }
@@ -56,31 +54,31 @@ fun ReviewScreen(
                 fontWeight = FontWeight.Bold
 
             )
-            TextTitle(title = review.title)
+            TextTitle(text = review.title)
             Row(
                 modifier = modifier.fillMaxWidth(),
             ) {
-                repeat(floor(review.rating).toInt()) {
+                repeat(review.rating.toInt()) {
                     Icon(
                         modifier = modifier.size(48.dp),
                         painter = painterResource(id = R.drawable.ic_round_star_24),
-                        contentDescription = R.string.star_desc.toString(),
+                        contentDescription = stringResource(R.string.star_desc),
                         tint = Color.Unspecified
                     )
                 }
-                if (review.rating % 1 != 0.0) {
-                    val starsRemaining = round((review.rating - floor(review.rating)) * 2) / 2.0
-                    if (starsRemaining != 0.0) {
-                        val starResourceId: Int =
-                            if (starsRemaining == 1.0) R.drawable.ic_round_star_24 else R.drawable.ic_round_star_half_24
-                        Icon(
-                            modifier = modifier.size(48.dp),
-                            painter = painterResource(id = starResourceId),
-                            contentDescription = R.string.star_desc.toString(),
-                            tint = Color.Unspecified
-                        )
-                    }
-                }
+//                if (review.rating % 1 != 0.0) {
+//                    val starsRemaining = round((review.rating - floor(review.rating)) * 2) / 2.0
+//                    if (starsRemaining != 0.0) {
+//                        val starResourceId: Int =
+//                            if (starsRemaining == 1.0) R.drawable.ic_round_star_24 else R.drawable.ic_round_star_half_24
+//                        Icon(
+//                            modifier = modifier.size(48.dp),
+//                            painter = painterResource(id = starResourceId),
+//                            contentDescription = stringResource(R.string.star_desc),
+//                            tint = Color.Unspecified
+//                        )
+//                    }
+//                }
             }
             Text(modifier = modifier, text = review.content)
         }

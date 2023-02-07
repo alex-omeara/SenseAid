@@ -1,11 +1,19 @@
-package com.app.senseaid.screens.common.composable
+package com.app.senseaid.common.composable
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -17,11 +25,11 @@ import com.google.firebase.storage.StorageReference
 @Composable
 fun TextTitle(
     modifier: Modifier = Modifier,
-    title: String,
+    text: String,
     textAlign: TextAlign? = null
 ) {
     Text(
-        text = title,
+        text = text,
         modifier = modifier
             .padding(vertical = 5.dp)
             .fillMaxWidth(),
@@ -32,12 +40,13 @@ fun TextTitle(
 }
 
 @Composable
-fun SmallTextTitle(modifier: Modifier = Modifier, title: String) {
+fun SmallTextTitle(modifier: Modifier, text: String, color: Color = Color.Unspecified) {
     Text(
-        text = title,
+        text = text,
         modifier = modifier
             .padding(vertical = 5.dp),
-        style = MaterialTheme.typography.titleSmall
+        style = MaterialTheme.typography.titleSmall,
+        color = color
     )
 }
 

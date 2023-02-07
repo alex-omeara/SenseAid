@@ -2,9 +2,10 @@ package com.app.senseaid.screens.home
 
 import android.content.Context
 import android.util.Log
-import com.app.senseaid.Routes
-import com.app.senseaid.domain.model.Review
-import com.app.senseaid.domain.repository.FirestoreRepository
+import com.app.senseaid.Routes.LOCATION_SCREEN
+import com.app.senseaid.model.Review
+import com.app.senseaid.model.Tags
+import com.app.senseaid.model.repository.FirestoreRepository
 import com.app.senseaid.screens.SenseAidViewModel
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -12,6 +13,7 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlin.random.Random
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
@@ -21,7 +23,7 @@ class HomeViewModel @Inject constructor(
     val locations = firestoreRepository.locations
 
     fun onLocationPress(locationId: String, navToScreen: (String) -> Unit) {
-        navToScreen("${Routes.LOCATION_SCREEN}?${Routes.LOCATION_ID}={${locationId}}")
+        navToScreen("${LOCATION_SCREEN}/{${locationId}}")
     }
 
     // TODO: Delete or improve

@@ -1,4 +1,4 @@
-package com.app.senseaid.domain.model
+package com.app.senseaid.model
 
 import com.google.firebase.firestore.DocumentId
 

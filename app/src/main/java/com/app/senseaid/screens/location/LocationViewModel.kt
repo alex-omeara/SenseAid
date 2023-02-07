@@ -1,16 +1,12 @@
 package com.app.senseaid.screens.location
 
-import android.util.Log
 import androidx.compose.runtime.mutableStateOf
-import com.app.senseaid.Routes
 import com.app.senseaid.Routes.ADD_REVIEW_SCREEN
 import com.app.senseaid.Routes.DEFAULT_ID
-import com.app.senseaid.Routes.LOCATION_ID
-import com.app.senseaid.Routes.REVIEW_ID
 import com.app.senseaid.Routes.REVIEW_SCREEN
-import com.app.senseaid.domain.model.Location
-import com.app.senseaid.domain.model.Review
-import com.app.senseaid.domain.repository.FirestoreRepository
+import com.app.senseaid.model.Location
+import com.app.senseaid.model.Review
+import com.app.senseaid.model.repository.FirestoreRepository
 import com.app.senseaid.screens.SenseAidViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
@@ -35,11 +31,11 @@ class LocationViewModel @Inject constructor(
     }
 
     fun onReviewPress(locationId: String, reviewId: String, navToScreen: (String) -> Unit) {
-        Log.i("press", "press")
-        navToScreen("${REVIEW_SCREEN}?${LOCATION_ID}={${locationId}}&${REVIEW_ID}={${reviewId}}")
+        navToScreen("${REVIEW_SCREEN}/{${locationId}}/{${reviewId}}")
     }
 
+
     fun onAddReview(locationId: String, navToScreen: (String) -> Unit) {
-        navToScreen("${ADD_REVIEW_SCREEN}?${LOCATION_ID}={${locationId}}")
+        navToScreen("${ADD_REVIEW_SCREEN}/{${locationId}}")
     }
 }

@@ -13,9 +13,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.app.senseaid.domain.model.Location
-import com.app.senseaid.screens.common.composable.LocationImage
-import com.app.senseaid.screens.common.composable.TextTitle
+import com.app.senseaid.model.Location
+import com.app.senseaid.common.composable.LocationImage
+import com.app.senseaid.common.composable.TextTitle
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -41,7 +41,7 @@ fun LocationItem(
                 imgDesc = location.imgDesc,
             )
             TextTitle(
-                title = location.title,
+                text = location.title,
                 textAlign = TextAlign.Center
             )
         }

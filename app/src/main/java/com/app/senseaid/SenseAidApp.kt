@@ -9,20 +9,21 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.app.senseaid.Routes.ADD_REVIEW_OPTIONAL_SCREEN
 import com.app.senseaid.Routes.ADD_REVIEW_SCREEN
+import com.app.senseaid.Routes.ADD_REVIEW_AUTHOR
 import com.app.senseaid.Routes.HOME_SCREEN
 import com.app.senseaid.Routes.LOCATION_SCREEN
 import com.app.senseaid.Routes.DEFAULT_ID
 import com.app.senseaid.Routes.LOCATION_ID
-import com.app.senseaid.Routes.LOCATION_ID_ARG
 import com.app.senseaid.Routes.REVIEW_ID
-import com.app.senseaid.Routes.REVIEW_ID_ARG
 import com.app.senseaid.Routes.REVIEW_SCREEN
-import com.app.senseaid.screens.add_review.AddReviewScreen
+import com.app.senseaid.screens.add_review.AddReviewContentScreen
 import com.app.senseaid.screens.home.HomeScreen
 import com.app.senseaid.screens.location.LocationScreen
 import com.app.senseaid.screens.review.ReviewScreen
@@ -39,6 +40,8 @@ object Routes {
     const val REVIEW_ID = "reviewId"
     const val REVIEW_ID_ARG = "$REVIEW_ID={$REVIEW_ID}"
     const val ADD_REVIEW_SCREEN = "addReview"
+    const val ADD_REVIEW_OPTIONAL_SCREEN = "addReviewOptional"
+    const val ADD_REVIEW_AUTHOR = "author"
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -72,8 +75,8 @@ fun NavGraphBuilder.senseAidGraph(navController: NavHostController) {
     }
 
     composable(
-        route = "$LOCATION_SCREEN$LOCATION_ID_ARG",
-        arguments = listOf(navArgument(LOCATION_ID) { defaultValue = DEFAULT_ID })
+        route = "$LOCATION_SCREEN/{$LOCATION_ID}",
+        arguments = listOf(navArgument(LOCATION_ID) { type = NavType.StringType })
     ) {
         LocationScreen(
             locationId = it.arguments?.getString(LOCATION_ID) ?: DEFAULT_ID,
@@ -84,10 +87,10 @@ fun NavGraphBuilder.senseAidGraph(navController: NavHostController) {
     }
 
     composable(
-        route = "$REVIEW_SCREEN$LOCATION_ID_ARG&$REVIEW_ID_ARG",
+        route = "$REVIEW_SCREEN/{$LOCATION_ID}/{$REVIEW_ID}",
         arguments = listOf(
-            navArgument(REVIEW_ID) { defaultValue = DEFAULT_ID },
-            navArgument(LOCATION_ID) { defaultValue = DEFAULT_ID }
+            navArgument(LOCATION_ID) { type = NavType.StringType },
+            navArgument(REVIEW_ID) { type = NavType.StringType }
         )
     ) {
         ReviewScreen(
@@ -98,12 +101,13 @@ fun NavGraphBuilder.senseAidGraph(navController: NavHostController) {
     }
 
     composable(
-        route = "$ADD_REVIEW_SCREEN$LOCATION_ID_ARG",
-        arguments = listOf(navArgument(LOCATION_ID) { defaultValue = DEFAULT_ID })
+        route = "$ADD_REVIEW_SCREEN/{$LOCATION_ID}",
+        arguments = listOf(navArgument(LOCATION_ID) { type = NavType.StringType })
     ) {
-        AddReviewScreen(
+        AddReviewContentScreen(
             locationId = it.arguments?.getString(LOCATION_ID) ?: DEFAULT_ID,
-            onButtonPress = { navController.popBackStack() }
+            onBackPress = { navController.popBackStack() },
+            onSubmitPress = { navController.popBackStack() }
         )
     }
 }

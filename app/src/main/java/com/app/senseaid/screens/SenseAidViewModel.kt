@@ -1,9 +1,8 @@
 package com.app.senseaid.screens
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.app.senseaid.domain.repository.StorageRepository
+import com.app.senseaid.model.repository.StorageRepository
 import com.google.firebase.storage.StorageReference
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch

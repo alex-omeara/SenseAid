@@ -1,4 +1,4 @@
-package com.app.senseaid.domain.model
+package com.app.senseaid.model
 
 import com.google.firebase.firestore.DocumentId
 import com.google.gson.annotations.SerializedName
@@ -13,7 +13,7 @@ data class Review(
     @SerializedName("rating")
     val rating: Double = 0.0,
     @SerializedName("tags")
-    val tags: String = "",
+    val tags: List<String> = emptyList(),
     @SerializedName("content")
     val content: String = ""
 )

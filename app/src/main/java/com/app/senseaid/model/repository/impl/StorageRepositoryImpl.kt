@@ -1,9 +1,8 @@
-package com.app.senseaid.data.repository
+package com.app.senseaid.model.repository.impl
 
-import com.app.senseaid.domain.repository.StorageRepository
+import com.app.senseaid.model.repository.StorageRepository
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
-import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class StorageRepositoryImpl @Inject constructor(

@@ -4,6 +4,16 @@
     <string name="star_desc">Star</string>
     <string name="back_button">Back button</string>
     <string name="add_review">Add review</string>
-    <string name="add_review_title">Leave your review</string>
-    <string name="cancel">Cancel review</string>
+    <string name="add_review_screen_title">Leave your review</string>
+    <string name="add_review_title">Rate Your Experience</string>
+    <string name="add_review_content">Would you like to write anything about this place?</string>
+    <string name="cancel">Cancel</string>
+    <string name="confirm">Confirm</string>
+    <string name="chars_remaining">characters remaining</string>
+    <string name="submit">Submit</string>
+    <string name="add_sound_recording">Add Sound Recording?</string>
+    <string name="select_tags">Add Some Tags?</string>
+    <string name="upload">Upload</string>
+    <string name="click_to_upload">Click here to upload</string>
+    <string name="remove">remove</string>
 </resources>
