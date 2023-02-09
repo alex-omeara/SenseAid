@@ -10,7 +10,6 @@ import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.window.PopupPositionProvider
-import com.app.senseaid.model.Review
 import com.app.senseaid.model.Tags
 import com.app.senseaid.model.repository.FirestoreRepository
 import com.app.senseaid.screens.SenseAidViewModel
@@ -34,7 +33,7 @@ class AddReviewViewModel @Inject constructor(
     val selectedTags = mutableStateMapOf<Tags, Boolean>()
 
     var popupState by mutableStateOf(false)
-    private set
+        private set
 
     fun onPopup() {
         popupState = !popupState
@@ -51,20 +50,37 @@ class AddReviewViewModel @Inject constructor(
         rating = newRating
     }
 
-    fun onSubmitReviewContent(
+    fun onSubmit(
         locationId: String,
+        totalRatings: String,
+        avgRating: String,
         author: String,
         navToScreen: () -> Unit
     ) {
         launchCatching {
-            val review = Review(
+            val formattedLocationId = locationId.substring(1, locationId.length - 1)
+            val formattedTotalRatings = totalRatings.substring(1, totalRatings.length - 3).toInt()
+            firestoreRepository.addReview(
                 author = author,
                 rating = rating.toDouble(),
-                tags = selectedTags.keys.map { it.toString() },
-                content = reviewContentText
+                tags = selectedTags.filter { (_, value) -> value }.keys.map { it.toString() },
+                content = reviewContentText,
+                locationId = formattedLocationId
             )
-            Log.i("new review", review.id)
-//            firestoreRepository.addReview(review, locationId)
+            firestoreRepository.updateLocationField(
+                locationId = formattedLocationId,
+                field = "avgRating",
+                value = getNewAvgRating(
+                    newRating = rating.toDouble(),
+                    totalRatings = formattedTotalRatings,
+                    avgRating = avgRating.substring(1, avgRating.length - 1).toDouble()
+                )
+            )
+            firestoreRepository.updateLocationField(
+                locationId = formattedLocationId,
+                field = "totalReviews",
+                value = formattedTotalRatings + 1
+            )
         }
         navToScreen()
     }
@@ -73,12 +89,20 @@ class AddReviewViewModel @Inject constructor(
         selectedTags[tag] = selectedTags[tag] == false || selectedTags[tag] == null
         Log.i("tag state", "$tag : ${selectedTags[tag]}")
     }
+
+    private fun getNewAvgRating(
+        newRating: Double,
+        totalRatings: Int,
+        avgRating: Double
+    ): Double =
+        avgRating + ((newRating - avgRating) / (totalRatings + 1))
+
 }
 
 class CenterWindowOffsetPopupPositionProvider(
     private val x: Int = 0,
     private val y: Int = 0,
-    ) : PopupPositionProvider {
+) : PopupPositionProvider {
     override fun calculatePosition(
         anchorBounds: IntRect,
         windowSize: IntSize,

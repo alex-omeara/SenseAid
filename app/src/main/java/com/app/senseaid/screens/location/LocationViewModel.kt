@@ -1,5 +1,6 @@
 package com.app.senseaid.screens.location
 
+import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import com.app.senseaid.Routes.ADD_REVIEW_SCREEN
 import com.app.senseaid.Routes.DEFAULT_ID
@@ -8,6 +9,9 @@ import com.app.senseaid.model.Location
 import com.app.senseaid.model.Review
 import com.app.senseaid.model.repository.FirestoreRepository
 import com.app.senseaid.screens.SenseAidViewModel
+import com.google.firebase.firestore.SetOptions
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
@@ -35,7 +39,7 @@ class LocationViewModel @Inject constructor(
     }
 
 
-    fun onAddReview(locationId: String, navToScreen: (String) -> Unit) {
-        navToScreen("${ADD_REVIEW_SCREEN}/{${locationId}}")
+    fun onAddReview(location: Location, navToScreen: (String) -> Unit) {
+        navToScreen("${ADD_REVIEW_SCREEN}/{${location.id}}/{${location.totalReviews}}/{${location.avgRating}}")
     }
 }

@@ -24,6 +24,8 @@ fun AddReviewContentScreen(
     modifier: Modifier = Modifier,
     viewModel: AddReviewViewModel = hiltViewModel(),
     locationId: String,
+    totalRatings: String,
+    avgRating: String,
     onBackPress: () -> Unit,
     onSubmitPress: () -> Unit
 ) {
@@ -74,9 +76,13 @@ fun AddReviewContentScreen(
                             ) {
                                 val selectedTags = viewModel.selectedTags
                                 enumValues<Tags>().forEach { tag ->
-                                    val color = if (selectedTags[tag] == true) Color.Green else Color.Blue
+                                    val color =
+                                        if (selectedTags[tag] == true) Color.Green else Color.Blue
                                     Button(
-                                        modifier = modifier.padding(horizontal = 4.dp, vertical = 2.dp),
+                                        modifier = modifier.padding(
+                                            horizontal = 4.dp,
+                                            vertical = 2.dp
+                                        ),
                                         colors = ButtonDefaults.buttonColors(containerColor = color),
                                         onClick = { viewModel.onTagSelect(tag) }
                                     ) {
@@ -121,18 +127,14 @@ fun AddReviewContentScreen(
             )
             // TODO: Move to bottom of screen (custom layout not BottomAppBar)
             BasicButton(text = R.string.submit, modifier = modifier.fillMaxWidth()) {
-                viewModel.onSubmitReviewContent(
+                viewModel.onSubmit(
                     locationId = locationId,
+                    totalRatings = totalRatings,
+                    avgRating = avgRating,
                     author = "me",
                     navToScreen = onSubmitPress
                 )
             }
         }
     }
-}
-
-@Preview
-@Composable
-fun AddReviewPreview() {
-    AddReviewContentScreen(locationId = "locationId", onBackPress = {}) {}
 }

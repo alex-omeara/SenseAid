@@ -1,5 +1,6 @@
 package com.app.senseaid.screens.location
 
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -22,6 +23,10 @@ import com.app.senseaid.R
 import com.app.senseaid.common.composable.LocationImage
 import com.app.senseaid.common.composable.TextTitle
 import com.app.senseaid.screens.review.ReviewItem
+import com.google.firebase.firestore.SetOptions
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.flow.count
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -55,7 +60,7 @@ fun LocationScreen(
         floatingActionButtonPosition = FabPosition.End,
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { viewModel.onAddReview(location.id, onAddReviewPress) },
+                onClick = { viewModel.onAddReview(location, onAddReviewPress) },
                 shape = CircleShape,
                 containerColor = Color.Cyan
             ) {
@@ -79,7 +84,7 @@ fun LocationScreen(
 
             TextTitle(text = location.title, textAlign = TextAlign.Center)
             RatingInfo(
-                averageRating = location.avgRating ?: -1.0,
+                averageRating = location.avgRating,
                 totalReviews = reviews.value.size,
                 topTags = location.top_tags
             )
@@ -88,6 +93,7 @@ fun LocationScreen(
                     items = reviews.value
                 ) { reviewItem ->
                     ReviewItem(
+                        modifier = modifier.fillMaxWidth(),
                         review = reviewItem,
                         locationId = location.id,
                         onReviewPress = onReviewPress

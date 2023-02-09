@@ -8,8 +8,9 @@ data class Location(
     val title: String = "",
     val imgPath: String = "",
     val imgDesc: String = "",
-    val avgRating: Double? = null,
-    val top_tags: List<String> = emptyList()
+    val avgRating: Double = 0.0,
+    val top_tags: List<String> = emptyList(),
+    val totalReviews: Double = 0.0
     ) {
 
 

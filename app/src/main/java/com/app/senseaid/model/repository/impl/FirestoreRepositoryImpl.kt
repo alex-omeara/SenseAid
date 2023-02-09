@@ -1,10 +1,11 @@
 package com.app.senseaid.model.repository.impl
 
+import android.util.Log
 import com.app.senseaid.model.Location
 import com.app.senseaid.model.Review
-import com.app.senseaid.model.Tags
 import com.app.senseaid.model.repository.FirestoreRepository
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.ktx.snapshots
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.firestore.ktx.toObjects
@@ -31,9 +32,31 @@ class FirestoreRepositoryImpl @Inject constructor(
         firestore.collection(LOCATIONS_COLLECTION).document(locationId)
             .collection(REVIEWS_COLLECTIONS).document(reviewUid).get().await().toObject<Review>()
 
-    override suspend fun addReview(review: Review, locationId: String) {
-        firestore.collection(LOCATIONS_COLLECTION).document(locationId)
-            .collection(REVIEWS_COLLECTIONS).document().set(review)
+    override suspend fun addReview(
+        author: String,
+        rating: Double,
+        tags: List<String>,
+        content: String,
+        locationId: String
+    ) {
+        val documentReference = firestore.collection(LOCATIONS_COLLECTION)
+            .document(locationId)
+            .collection(REVIEWS_COLLECTIONS).document()
+        documentReference.set(
+            mapOf(
+                "author" to author,
+                "rating" to rating,
+                "tags" to tags,
+                "content" to content
+            )
+        )
+        Log.d("review added", "in locationId: $locationId, added review: ${documentReference.id}")
+    }
+
+    override suspend fun updateLocationField(locationId: String, field: String, value: Any) {
+        firestore.collection(LOCATIONS_COLLECTION).document(locationId).set(mapOf(
+            field to value
+        ), SetOptions.merge())
     }
 
     override suspend fun getLocation(locationId: String): Location? =

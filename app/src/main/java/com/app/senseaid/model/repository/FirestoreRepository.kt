@@ -13,7 +13,15 @@ interface FirestoreRepository {
 
     suspend fun getReview(locationId: String, reviewUid: String): Review?
 
-    suspend fun addReview(review: Review, locationId: String)
+    suspend fun addReview(
+        author: String,
+        rating: Double,
+        tags: List<String>,
+        content: String,
+        locationId: String
+    )
+
+    suspend fun updateLocationField(locationId: String, field: String, value: Any)
 
     suspend fun getLocation(locationId: String): Location?
 

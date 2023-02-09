@@ -14,15 +14,15 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.app.senseaid.Routes.ADD_REVIEW_OPTIONAL_SCREEN
 import com.app.senseaid.Routes.ADD_REVIEW_SCREEN
-import com.app.senseaid.Routes.ADD_REVIEW_AUTHOR
+import com.app.senseaid.Routes.AVERAGE_RATING
 import com.app.senseaid.Routes.HOME_SCREEN
 import com.app.senseaid.Routes.LOCATION_SCREEN
 import com.app.senseaid.Routes.DEFAULT_ID
 import com.app.senseaid.Routes.LOCATION_ID
 import com.app.senseaid.Routes.REVIEW_ID
 import com.app.senseaid.Routes.REVIEW_SCREEN
+import com.app.senseaid.Routes.TOTAL_RATING
 import com.app.senseaid.screens.add_review.AddReviewContentScreen
 import com.app.senseaid.screens.home.HomeScreen
 import com.app.senseaid.screens.location.LocationScreen
@@ -35,13 +35,11 @@ object Routes {
     const val DEFAULT_ID = "-1"
     const val LOCATION_SCREEN = "location"
     const val LOCATION_ID = "locationId"
-    const val LOCATION_ID_ARG = "?$LOCATION_ID={$LOCATION_ID}"
     const val REVIEW_SCREEN = "review"
     const val REVIEW_ID = "reviewId"
-    const val REVIEW_ID_ARG = "$REVIEW_ID={$REVIEW_ID}"
     const val ADD_REVIEW_SCREEN = "addReview"
-    const val ADD_REVIEW_OPTIONAL_SCREEN = "addReviewOptional"
-    const val ADD_REVIEW_AUTHOR = "author"
+    const val TOTAL_RATING = "totalRatings"
+    const val AVERAGE_RATING = "avgRating"
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -101,11 +99,17 @@ fun NavGraphBuilder.senseAidGraph(navController: NavHostController) {
     }
 
     composable(
-        route = "$ADD_REVIEW_SCREEN/{$LOCATION_ID}",
-        arguments = listOf(navArgument(LOCATION_ID) { type = NavType.StringType })
+        route = "$ADD_REVIEW_SCREEN/{$LOCATION_ID}/{$TOTAL_RATING}/{$AVERAGE_RATING}",
+        arguments = listOf(
+            navArgument(LOCATION_ID) { type = NavType.StringType },
+            navArgument(TOTAL_RATING) { type = NavType.StringType },
+            navArgument(AVERAGE_RATING) { type = NavType.StringType }
+        )
     ) {
         AddReviewContentScreen(
             locationId = it.arguments?.getString(LOCATION_ID) ?: DEFAULT_ID,
+            totalRatings = it.arguments?.getString(TOTAL_RATING) ?: DEFAULT_ID,
+            avgRating = it.arguments?.getString(AVERAGE_RATING) ?: DEFAULT_ID,
             onBackPress = { navController.popBackStack() },
             onSubmitPress = { navController.popBackStack() }
         )
