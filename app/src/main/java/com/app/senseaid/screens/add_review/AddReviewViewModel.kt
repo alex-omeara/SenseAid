@@ -14,7 +14,10 @@ import com.app.senseaid.model.Tags
 import com.app.senseaid.model.repository.FirestoreRepository
 import com.app.senseaid.screens.SenseAidViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.math.RoundingMode
+import java.text.DecimalFormat
 import javax.inject.Inject
+import kotlin.math.round
 
 @HiltViewModel
 class AddReviewViewModel @Inject constructor(
@@ -88,15 +91,19 @@ class AddReviewViewModel @Inject constructor(
     fun onTagSelect(tag: Tags) {
         selectedTags[tag] = selectedTags[tag] == false || selectedTags[tag] == null
         Log.i("tag state", "$tag : ${selectedTags[tag]}")
+        round(2.592)
     }
 
     private fun getNewAvgRating(
         newRating: Double,
         totalRatings: Int,
         avgRating: Double
-    ): Double =
-        avgRating + ((newRating - avgRating) / (totalRatings + 1))
-
+    ): Double {
+        val newAvg = avgRating + ((newRating - avgRating) / (totalRatings + 1))
+        val df = DecimalFormat("#.##")
+        df.roundingMode = RoundingMode.HALF_UP
+        return df.format(newAvg).toDouble()
+    }
 }
 
 class CenterWindowOffsetPopupPositionProvider(
