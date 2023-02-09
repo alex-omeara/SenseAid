@@ -14,11 +14,12 @@ import androidx.compose.ui.window.Popup
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.app.senseaid.R
 import com.app.senseaid.common.composable.*
+import com.app.senseaid.common.popup.CenterWindowOffsetPositionProvider
 import com.app.senseaid.model.Tags
 import com.gowtham.ratingbar.RatingBar
 import com.gowtham.ratingbar.RatingBarConfig
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddReviewContentScreen(
     modifier: Modifier = Modifier,
@@ -56,59 +57,11 @@ fun AddReviewContentScreen(
                 onValueChange = { newRating -> viewModel.updateRating(newRating) },
                 onRatingChanged = { Log.d("RATING", "onRatingChanged: $it") }
             )
-            FlowRow() {
-                BasicButton(text = R.string.select_tags, modifier = modifier) {
-                    viewModel.onPopup()
-                }
-                if (viewModel.popupState) {
-                    Popup(
-                        onDismissRequest = { viewModel.onPopup() },
-                        popupPositionProvider = CenterWindowOffsetPopupPositionProvider(),
-                    ) {
-                        Surface(
-                            modifier = modifier.padding(8.dp),
-                            shape = RoundedCornerShape(32.dp),
-                            color = Color(0xCCEEEEEE),
-                            shadowElevation = 4.dp
-                        ) {
-                            FlowRow(
-                                horizontalArrangement = Arrangement.Start
-                            ) {
-                                val selectedTags = viewModel.selectedTags
-                                enumValues<Tags>().forEach { tag ->
-                                    val color =
-                                        if (selectedTags[tag] == true) Color.Green else Color.Blue
-                                    Button(
-                                        modifier = modifier.padding(
-                                            horizontal = 4.dp,
-                                            vertical = 2.dp
-                                        ),
-                                        colors = ButtonDefaults.buttonColors(containerColor = color),
-                                        onClick = { viewModel.onTagSelect(tag) }
-                                    ) {
-                                        Text(text = tag.toString())
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                if (viewModel.selectedTags.containsValue(true)) {
-                    viewModel.selectedTags.forEach { (key, value) ->
-                        if (value) {
-                            IconTextButton(
-                                text = key.toString(),
-                                modifier = modifier,
-                                iconRes = R.drawable.ic_baseline_close_24,
-                                iconDesc = R.string.remove
-                            ) {
 
-                            }
-                        }
-                    }
-                }
-            }
+            TagsRow(modifier = modifier, viewModel = viewModel)
+
             SmallTextTitle(modifier = modifier, text = stringResource(R.string.add_sound_recording))
+
             UploadMedia(
                 modifier = modifier,
                 contentColor = Color.LightGray,
@@ -117,6 +70,7 @@ fun AddReviewContentScreen(
                 iconDescription = R.string.upload,
                 mediaAction = R.string.click_to_upload
             )
+
             CharRemainingField(
                 text = R.string.add_review_content,
                 charsRemaining = R.string.chars_remaining,
@@ -125,6 +79,7 @@ fun AddReviewContentScreen(
                 charsAdded = viewModel.charsAdded,
                 onNewValue = viewModel::updateReviewContent
             )
+
             // TODO: Move to bottom of screen (custom layout not BottomAppBar)
             BasicButton(text = R.string.submit, modifier = modifier.fillMaxWidth()) {
                 viewModel.onSubmit(
@@ -134,6 +89,66 @@ fun AddReviewContentScreen(
                     author = "me",
                     navToScreen = onSubmitPress
                 )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+fun TagsRow(
+    modifier: Modifier,
+    viewModel: AddReviewViewModel
+) {
+    FlowRow() {
+        BasicButton(text = R.string.select_tags, modifier = modifier) {
+            viewModel.onPopup()
+        }
+        if (viewModel.popupState) {
+            Popup(
+                onDismissRequest = { viewModel.onPopup() },
+                popupPositionProvider = CenterWindowOffsetPositionProvider(),
+            ) {
+                Surface(
+                    modifier = modifier.padding(8.dp),
+                    shape = RoundedCornerShape(32.dp),
+                    color = Color(0xCCEEEEEE),
+                    shadowElevation = 4.dp
+                ) {
+                    FlowRow(
+                        horizontalArrangement = Arrangement.Start
+                    ) {
+                        val selectedTags = viewModel.selectedTags
+                        enumValues<Tags>().forEach { tag ->
+                            val color =
+                                if (selectedTags[tag] == true) Color.Green else Color.Blue
+                            Button(
+                                modifier = modifier.padding(
+                                    horizontal = 4.dp,
+                                    vertical = 2.dp
+                                ),
+                                colors = ButtonDefaults.buttonColors(containerColor = color),
+                                onClick = { viewModel.onTagSelect(tag) }
+                            ) {
+                                Text(text = tag.toString())
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        if (viewModel.selectedTags.containsValue(true)) {
+            viewModel.selectedTags.forEach { (key, value) ->
+                if (value) {
+                    IconTextButton(
+                        text = key.toString(),
+                        modifier = modifier,
+                        iconRes = R.drawable.ic_baseline_close_24,
+                        iconDesc = R.string.remove
+                    ) {
+
+                    }
+                }
             }
         }
     }

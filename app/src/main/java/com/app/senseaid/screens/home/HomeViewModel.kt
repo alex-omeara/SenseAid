@@ -2,11 +2,13 @@ package com.app.senseaid.screens.home
 
 import android.content.Context
 import android.util.Log
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import com.app.senseaid.Routes.LOCATION_SCREEN
 import com.app.senseaid.model.Review
 import com.app.senseaid.model.repository.FirestoreRepository
 import com.app.senseaid.screens.SenseAidViewModel
-import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.gson.Gson
@@ -21,8 +23,16 @@ class HomeViewModel @Inject constructor(
 
     val locations = firestoreRepository.locations
 
+    var filterState by mutableStateOf(false)
+        private set
+
     fun onLocationPress(locationId: String, navToScreen: (String) -> Unit) {
         navToScreen("${LOCATION_SCREEN}/{${locationId}}")
+    }
+
+    fun onFilterPress() {
+        filterState = !filterState
+        Log.i("filter press", "${!filterState} => $filterState")
     }
 
     // TODO: Delete or improve

@@ -105,21 +105,3 @@ class AddReviewViewModel @Inject constructor(
         return df.format(newAvg).toDouble()
     }
 }
-
-class CenterWindowOffsetPopupPositionProvider(
-    private val x: Int = 0,
-    private val y: Int = 0,
-) : PopupPositionProvider {
-    override fun calculatePosition(
-        anchorBounds: IntRect,
-        windowSize: IntSize,
-        layoutDirection: LayoutDirection,
-        popupContentSize: IntSize
-    ): IntOffset {
-        return IntOffset(
-            (windowSize.width - popupContentSize.width) / 2 + x,
-            (windowSize.height - popupContentSize.height) / 2 + y,
-        )
-    }
-
-}

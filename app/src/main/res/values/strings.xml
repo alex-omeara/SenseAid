@@ -16,4 +16,5 @@
     <string name="upload">Upload</string>
     <string name="click_to_upload">Click here to upload</string>
     <string name="remove">remove</string>
+    <string name="filter">filter</string>
 </resources>
