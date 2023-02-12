@@ -1,10 +1,10 @@
 package com.app.senseaid.screens.location
 
-import android.util.Log
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -14,19 +14,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.app.senseaid.R
-import com.app.senseaid.common.composable.LocationImage
-import com.app.senseaid.common.composable.TextTitle
+import com.app.senseaid.common.composable.*
+import com.app.senseaid.model.SortDirection
 import com.app.senseaid.screens.review.ReviewItem
-import com.google.firebase.firestore.SetOptions
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
-import kotlinx.coroutines.flow.count
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -59,16 +57,11 @@ fun LocationScreen(
         },
         floatingActionButtonPosition = FabPosition.End,
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = { viewModel.onAddReview(location, onAddReviewPress) },
-                shape = CircleShape,
-                containerColor = Color.Cyan
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_baseline_add_24),
-                    contentDescription = stringResource(R.string.add_review)
-                )
-            }
+            BasicActionBar(
+                actionIcon = R.drawable.ic_baseline_add_24,
+                actionDesc = R.string.add_review,
+                fabAction = { viewModel.onAddReview(location, onAddReviewPress) }
+            )
         }
     ) { paddingValues ->
         Column(
@@ -80,24 +73,62 @@ fun LocationScreen(
                 imgStorageReference = viewModel.getLocationImage(location.imgPath),
                 imgDesc = location.imgDesc,
             )
-            val reviews = viewModel.reviews.collectAsStateWithLifecycle(emptyList())
+            val reviews = viewModel.reviews.value.collectAsStateWithLifecycle(emptyList())
 
-            TextTitle(text = location.title, textAlign = TextAlign.Center)
+            TextTitle(
+                modifier = modifier.fillMaxWidth(),
+                text = location.title,
+                textAlign = TextAlign.Center
+            )
             RatingInfo(
                 averageRating = location.avgRating,
                 totalReviews = reviews.value.size,
                 topTags = location.top_tags
             )
-            LazyColumn(modifier = modifier) {
+            Divider()
+            Box() {
+                SmallTextTitle(
+                    modifier = modifier.clickable(
+                        role = Role.DropdownList,
+                        onClickLabel = stringResource(id = R.string.sort_by)
+                    ) { viewModel.toggleSortReviews() },
+                    text = stringResource(id = R.string.sort_by),
+                    textAlign = TextAlign.End
+                )
+                DropdownMenu(
+                    expanded = viewModel.isSortReviews,
+                    onDismissRequest = {
+                        viewModel.toggleSortReviews()
+                        viewModel.launchCatching {
+                            viewModel.sortReviews()
+                        }
+                    },
+                    offset = DpOffset(260.dp, 0.dp)
+                ) {
+                    Sort(
+                        modifier = modifier,
+                        sortSelection = viewModel.sortSelection,
+                        excludeDirection = listOf(SortDirection.ASCENDING, SortDirection.DESCENDING),
+                        onClick = viewModel::onSortByPress
+                    )
+                }
+            }
+            val listState = rememberLazyListState()
+            LaunchedEffect(key1 = reviews.value.firstOrNull()) { listState.scrollToItem(0) }
+            LazyColumn(modifier = modifier.padding(horizontal = 10.dp), state = listState) {
                 items(
-                    items = reviews.value
+                    items = reviews.value,
+                    key = { it.id }
                 ) { reviewItem ->
                     ReviewItem(
-                        modifier = modifier.fillMaxWidth(),
                         review = reviewItem,
-                        locationId = location.id,
-                        onReviewPress = onReviewPress
-                    )
+                    ) {
+                        viewModel.onReviewPress(
+                            location.id,
+                            reviewItem.id,
+                            onReviewPress
+                        )
+                    }
                 }
             }
         }

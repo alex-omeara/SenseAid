@@ -68,7 +68,7 @@ fun rememberAppState(
 fun NavGraphBuilder.senseAidGraph(navController: NavHostController) {
     composable(HOME_SCREEN) {
         HomeScreen(
-            onLocationPress = { route -> navController.navigate(route) }
+            onItemPress = { route -> navController.navigate(route) }
         )
     }
 

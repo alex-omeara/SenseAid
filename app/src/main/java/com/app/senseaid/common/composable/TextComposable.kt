@@ -31,8 +31,7 @@ fun TextTitle(
     Text(
         text = text,
         modifier = modifier
-            .padding(vertical = 5.dp)
-            .fillMaxWidth(),
+            .padding(5.dp),
         style = MaterialTheme.typography.titleLarge,
         fontWeight = FontWeight.Bold,
         textAlign = textAlign
@@ -40,13 +39,20 @@ fun TextTitle(
 }
 
 @Composable
-fun SmallTextTitle(modifier: Modifier, text: String, color: Color = Color.Unspecified) {
+fun SmallTextTitle(
+    modifier: Modifier,
+    text: String,
+    color: Color = Color.Unspecified,
+    textAlign: TextAlign? = null
+) {
     Text(
         text = text,
         modifier = modifier
-            .padding(vertical = 5.dp),
+            .padding(5.dp)
+            .fillMaxWidth(),
         style = MaterialTheme.typography.titleSmall,
-        color = color
+        color = color,
+        textAlign = textAlign
     )
 }
 

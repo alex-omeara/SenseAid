@@ -1,6 +1,7 @@
 package com.app.senseaid.screens.home
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -26,15 +27,12 @@ fun LocationItem(
     onLocationPress: (String) -> Unit
 ) {
     Card(
-        modifier = modifier.padding(6.dp),
+        modifier = modifier.padding(6.dp).fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         onClick = { viewModel.onLocationPress(location.id, onLocationPress) }
     ) {
-        Column(
-            modifier = modifier,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
             LocationImage(
                 modifier = modifier.height(200.dp),
                 imgStorageReference = viewModel.getLocationImage(location.imgPath),

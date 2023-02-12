@@ -90,8 +90,7 @@ class AddReviewViewModel @Inject constructor(
 
     fun onTagSelect(tag: Tags) {
         selectedTags[tag] = selectedTags[tag] == false || selectedTags[tag] == null
-        Log.i("tag state", "$tag : ${selectedTags[tag]}")
-        round(2.592)
+        Log.d("tag state", "$tag : ${selectedTags[tag]}")
     }
 
     private fun getNewAvgRating(

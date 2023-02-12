@@ -7,6 +7,7 @@
     <string name="add_review_screen_title">Leave your review</string>
     <string name="add_review_title">Rate Your Experience</string>
     <string name="add_review_content">Would you like to write anything about this place?</string>
+    <string name="see_full_review_content">See more?</string>
     <string name="cancel">Cancel</string>
     <string name="confirm">Confirm</string>
     <string name="chars_remaining">characters remaining</string>
@@ -15,6 +16,9 @@
     <string name="select_tags">Add Some Tags?</string>
     <string name="upload">Upload</string>
     <string name="click_to_upload">Click here to upload</string>
-    <string name="remove">remove</string>
-    <string name="filter">filter</string>
+    <string name="remove">Remove</string>
+    <string name="filter">Filter</string>
+    <string name="sort_by">Sort by</string>
+    <string name="filter_and_sort">Filter &amp; Sort</string>
+    <string name="clear">Clear</string>
 </resources>

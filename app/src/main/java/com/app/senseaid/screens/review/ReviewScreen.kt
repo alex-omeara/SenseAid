@@ -54,7 +54,7 @@ fun ReviewScreen(
                 fontWeight = FontWeight.Bold
 
             )
-            TextTitle(text = review.title)
+            TextTitle(modifier = modifier.fillMaxWidth(), text = review.title)
             Row(
                 modifier = modifier.fillMaxWidth(),
             ) {
