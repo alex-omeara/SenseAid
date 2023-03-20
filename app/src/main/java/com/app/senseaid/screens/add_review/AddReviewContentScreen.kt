@@ -1,12 +1,25 @@
 package com.app.senseaid.screens.add_review
 
+import android.Manifest
+import android.os.Build
 import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.DrawableRes
+import androidx.annotation.RequiresApi
+import androidx.annotation.StringRes
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
@@ -18,6 +31,7 @@ import com.app.senseaid.model.Tags
 import com.gowtham.ratingbar.RatingBar
 import com.gowtham.ratingbar.RatingBarConfig
 
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddReviewContentScreen(
@@ -48,7 +62,10 @@ fun AddReviewContentScreen(
             ),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            TextTitle(modifier = modifier.fillMaxWidth(), text = stringResource(R.string.add_review_title))
+            TextTitle(
+                modifier = modifier.fillMaxWidth(),
+                text = stringResource(R.string.add_review_title)
+            )
 
             RatingBar(
                 value = viewModel.rating,
@@ -67,16 +84,25 @@ fun AddReviewContentScreen(
                 shape = RoundedCornerShape(10.dp),
                 icon = R.drawable.ic_baseline_cloud_upload_24,
                 iconDescription = R.string.upload,
-                mediaAction = R.string.click_to_upload
+                mediaAction = R.string.click_to_upload,
+                setSoundUri = viewModel::setSoundUri
             )
-
+            RecordButton(
+                iconRes = R.drawable.ic_baseline_mic_24,
+                iconDesc = R.string.mic,
+            )
+            OutlinedTextField(
+                placeholder = { Text(text = stringResource(id = R.string.add_review_author)) },
+                value = viewModel.reviewAuthor,
+                onValueChange = { viewModel.updateReviewAuthor(it) }
+            )
             CharRemainingField(
                 text = R.string.add_review_content,
                 charsRemaining = R.string.chars_remaining,
                 value = viewModel.reviewContentText,
                 modifier = modifier,
                 charsAdded = viewModel.charsAdded,
-                onNewValue = viewModel::updateReviewContent
+                onValueChange = viewModel::updateReviewContent
             )
 
             // TODO: Move to bottom of screen (custom layout not BottomAppBar)
@@ -99,7 +125,7 @@ fun TagsRow(
     modifier: Modifier,
     viewModel: AddReviewViewModel = hiltViewModel()
 ) {
-    FlowRow() {
+    FlowRow {
         BasicButton(text = R.string.select_tags, modifier = modifier) {
             viewModel.onPopup()
         }
@@ -140,7 +166,7 @@ fun TagsRow(
             viewModel.selectedTags.forEach { (key, value) ->
                 if (value) {
                     IconTextButton(
-                        text = key.toString(),
+                        text = { Text(text = key.toString()) },
                         modifier = modifier,
                         iconRes = R.drawable.ic_baseline_close_24,
                         iconDesc = R.string.remove
@@ -149,6 +175,61 @@ fun TagsRow(
                     }
                 }
             }
+        }
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
+@Composable
+fun RecordButton(
+    modifier: Modifier = Modifier,
+    viewModel: AddReviewViewModel = hiltViewModel(),
+    @DrawableRes iconRes: Int,
+    @StringRes iconDesc: Int,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+) {
+    Log.i("IR", "${viewModel.isRecorded}")
+    if (!viewModel.isRecorded) {
+        val context = LocalContext.current
+        val permissions =
+            arrayOf(Manifest.permission.RECORD_AUDIO, Manifest.permission.READ_MEDIA_AUDIO)
+        val launcher =
+            rememberLauncherForActivityResult(contract = ActivityResultContracts.RequestMultiplePermissions()) { permissionsMap ->
+                val areGranted = permissionsMap.values.reduce { acc, next -> acc && next }
+                if (areGranted) {
+                    Log.i("AddReviewContentScreen", "permission granted")
+                } else {
+                    Log.i("AddReviewContentScreen", "permission denied")
+                }
+            }
+        val isPressed by interactionSource.collectIsPressedAsState()
+        val color = if (isPressed) Color.Red else Color.Transparent
+        if (isPressed) {
+            viewModel.checkAndRequestPermission(context, permissions, launcher)
+        } else {
+            viewModel.stopRecording()
+        }
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(text = "${stringResource(id = R.string.record_audio)}:")
+            Spacer(modifier = Modifier.size(ButtonDefaults.IconSpacing))
+            TextButton(
+                onClick = { },
+                modifier = modifier,
+                interactionSource = interactionSource,
+                colors = ButtonDefaults.textButtonColors(containerColor = color)
+            ) {
+                Icon(
+                    painter = painterResource(id = iconRes),
+                    contentDescription = stringResource(id = iconDesc)
+                )
+                AnimatedVisibility(visible = isPressed) {
+                    Text(text = "${viewModel.recordTime}s / 5s")
+                }
+            }
+        }
+    } else {
+        TextButton(onClick = { viewModel.onRecorded() }) {
+            Text(text = stringResource(id = R.string.record_audio_again))
         }
     }
 }

@@ -1,5 +1,9 @@
 package com.app.senseaid.screens.location
 
+import android.content.Context
+import android.media.AudioAttributes
+import android.media.MediaPlayer
+import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
@@ -12,6 +16,7 @@ import com.app.senseaid.model.Location
 import com.app.senseaid.model.Review
 import com.app.senseaid.model.SortDirection
 import com.app.senseaid.model.repository.FirestoreRepository
+import com.app.senseaid.model.repository.StorageRepository
 import com.app.senseaid.screens.SenseAidViewModel
 import com.google.firebase.firestore.Query
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,10 +25,10 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LocationViewModel @Inject constructor(
-    private val firestoreRepository: FirestoreRepository
+    private val firestoreRepository: FirestoreRepository,
+    storageRepository: StorageRepository
 ) : SenseAidViewModel() {
     val location = mutableStateOf(Location())
-//    var reviews: Flow<List<Review>> = emptyFlow()
 
     val reviews: MutableState<Flow<List<Review>>> =
         mutableStateOf(emptyFlow())
@@ -68,8 +73,25 @@ class LocationViewModel @Inject constructor(
         navToScreen("${REVIEW_SCREEN}/{${locationId}}/{${reviewId}}")
     }
 
-
     fun onAddReview(location: Location, navToScreen: (String) -> Unit) {
         navToScreen("${ADD_REVIEW_SCREEN}/{${location.id}}/{${location.totalReviews}}/{${location.avgRating}}")
+    }
+
+    fun startPlaying(context: Context, filePath: String) {
+        storageRepository.getFileDownloadUri(filePath).addOnSuccessListener {
+            var mediaPlayer = MediaPlayer().apply {
+                setAudioAttributes(
+                    AudioAttributes.Builder()
+                        .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+                        .setUsage(AudioAttributes.USAGE_MEDIA)
+                        .build()
+                )
+                Log.i("asd", it.toString())
+                setDataSource(it.toString())
+                prepare()
+                start()
+            }
+        }
+
     }
 }

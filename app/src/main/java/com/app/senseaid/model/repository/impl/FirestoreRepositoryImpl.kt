@@ -100,7 +100,8 @@ class FirestoreRepositoryImpl @Inject constructor(
         rating: Double,
         tags: List<String>,
         content: String,
-        locationId: String
+        locationId: String,
+        soundRecording: String?
     ) {
         val documentReference = firestore.collection(LOCATIONS_COLLECTION)
             .document(locationId)
@@ -110,15 +111,17 @@ class FirestoreRepositoryImpl @Inject constructor(
                 "author" to author,
                 "rating" to rating,
                 "tags" to tags,
-                "content" to content
+                "content" to content,
+                "sound_recording" to soundRecording
             )
         )
-        Log.d("review added", "in locationId: $locationId, added review: ${documentReference.id}")
+        Log.d(TAG, "review added in locationId: $locationId, added review: ${documentReference.id}")
     }
 
 
     companion object {
         private const val LOCATIONS_COLLECTION = "locations"
         private const val REVIEWS_COLLECTIONS = "reviews"
+        private const val TAG = "FirestoreRepository"
     }
 }

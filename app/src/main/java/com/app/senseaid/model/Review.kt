@@ -15,5 +15,6 @@ data class Review(
     @SerializedName("tags")
     val tags: List<String> = emptyList(),
     @SerializedName("content")
-    val content: String = ""
+    val content: String = "",
+    val sound_recording: String? = null
 )

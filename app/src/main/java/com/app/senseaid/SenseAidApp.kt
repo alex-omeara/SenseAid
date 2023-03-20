@@ -1,5 +1,7 @@
 package com.app.senseaid
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
@@ -65,6 +67,7 @@ fun rememberAppState(
     coroutineScope: CoroutineScope = rememberCoroutineScope()
 ) = remember(navController,coroutineScope) { SenseAidAppState(navController, coroutineScope) }
 
+@RequiresApi(Build.VERSION_CODES.S)
 fun NavGraphBuilder.senseAidGraph(navController: NavHostController) {
     composable(HOME_SCREEN) {
         HomeScreen(

@@ -70,10 +70,8 @@ fun HomeScreen(
                     IconButton(onClick = {
                         if (scaffoldState.isConcealed) {
                             coroutineScope.launch { scaffoldState.reveal() }
-                            Log.i("scaffoldState", "isConcealed: ${scaffoldState.isConcealed}")
                         } else if (scaffoldState.isRevealed) {
                             coroutineScope.launch { scaffoldState.conceal() }
-                            Log.i("scaffoldState", "isConcealed: ${scaffoldState.isConcealed}")
                         }
                     }) {
                         Icon(

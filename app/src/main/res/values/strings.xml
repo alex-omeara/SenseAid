@@ -7,6 +7,7 @@
     <string name="add_review_screen_title">Leave your review</string>
     <string name="add_review_title">Rate Your Experience</string>
     <string name="add_review_content">Would you like to write anything about this place?</string>
+    <string name="add_review_author">Author Name</string>
     <string name="see_full_review_content">See more?</string>
     <string name="cancel">Cancel</string>
     <string name="confirm">Confirm</string>
@@ -21,4 +22,7 @@
     <string name="sort_by">Sort by</string>
     <string name="filter_and_sort">Filter &amp; Sort</string>
     <string name="clear">Clear</string>
+    <string name="record_audio">Record microphone audio</string>
+    <string name="mic">Mic</string>
+    <string name="record_audio_again">Record audio again?</string>
 </resources>

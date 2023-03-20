@@ -34,7 +34,8 @@ interface FirestoreRepository {
         rating: Double,
         tags: List<String>,
         content: String,
-        locationId: String
+        locationId: String,
+        soundRecording: String?
     )
     // TODO: Add deleteLocationFromFirestore method using firebase docs to do correctly
 

@@ -16,12 +16,12 @@ fun CharRemainingField(
     value: String,
     modifier: Modifier,
     charsAdded: Int,
-    onNewValue: (String) -> Unit
+    onValueChange: (String) -> Unit
 ) {
     OutlinedTextField(
         modifier = modifier,
         value = value,
-        onValueChange = { onNewValue(it) },
+        onValueChange = { onValueChange(it) },
         placeholder = { Text(stringResource(text)) },
         supportingText = { Text("${400 - charsAdded} ${stringResource(charsRemaining)}") },
         minLines = 7,
