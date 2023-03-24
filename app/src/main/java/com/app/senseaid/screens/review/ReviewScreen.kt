@@ -1,6 +1,7 @@
 package com.app.senseaid.screens.review
 
 import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -23,7 +24,6 @@ fun ReviewScreen(
     viewModel: ReviewViewModel = hiltViewModel(),
     locationId: String,
     reviewId: String,
-//    review: Review = Review(),
     onBackPress: () -> Unit
 ) {
     Log.i("Review Screen", "locationId: $locationId, reviewId: $reviewId")
@@ -35,7 +35,6 @@ fun ReviewScreen(
         topBar = {
             TopAppBar(
                 title = {},
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Gray),
                 navigationIcon = {
                     IconButton(onClick = onBackPress) {
                         Icon(
@@ -47,7 +46,12 @@ fun ReviewScreen(
             )
         }
     ) { paddingValues ->
-        Column(modifier = modifier.padding(paddingValues)) {
+        Column(
+            modifier = modifier
+                .padding(paddingValues)
+                .fillMaxHeight()
+                .background(MaterialTheme.colorScheme.primaryContainer)
+        ) {
             Text(
                 modifier = modifier.fillMaxWidth(),
                 text = review.author,
@@ -66,37 +70,8 @@ fun ReviewScreen(
                         tint = Color.Unspecified
                     )
                 }
-//                if (review.rating % 1 != 0.0) {
-//                    val starsRemaining = round((review.rating - floor(review.rating)) * 2) / 2.0
-//                    if (starsRemaining != 0.0) {
-//                        val starResourceId: Int =
-//                            if (starsRemaining == 1.0) R.drawable.ic_round_star_24 else R.drawable.ic_round_star_half_24
-//                        Icon(
-//                            modifier = modifier.size(48.dp),
-//                            painter = painterResource(id = starResourceId),
-//                            contentDescription = stringResource(R.string.star_desc),
-//                            tint = Color.Unspecified
-//                        )
-//                    }
-//                }
             }
             Text(modifier = modifier, text = review.content)
         }
     }
 }
-
-//@Preview
-//@Composable
-//fun ReviewScreenPreview() {
-//    ReviewScreen(
-//        locationId = "",
-//        reviewId = "",
-//        review = Review(
-//            id = "fakeId",
-//            title = "Title",
-//            author = "Author",
-//            rating = 3.5,
-//            content = "Donec eget felis gravida tellus molestie semper. Donec ac luctus nulla. Donec urna elit, aliquet nec ultrices non, lacinia sit amet turpis. Suspendisse lobortis magna eu tempus vulputate. Proin id dui dui. Morbi nec nisl ipsum. Proin sit amet consectetur erat, ac sodales ipsum. Aenean porttitor sollicitudin ex et vehicula."
-//        )
-//    )
-//}

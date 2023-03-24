@@ -9,12 +9,7 @@ data class Location(
     val imgPath: String = "",
     val imgDesc: String = "",
     val avgRating: Double = 0.0,
-    val top_tags: List<String> = emptyList(),
-    val totalReviews: Double = 0.0
-    ) {
-
-
-    companion object {
-        private const val TAG = "Location"
-    }
-}
+    val top_tags: List<LocationTags> = emptyList(),
+    val category: CategoryTags = CategoryTags.DEFAULT,
+    val totalReviews: Int = 0
+)

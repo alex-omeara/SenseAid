@@ -3,20 +3,17 @@ package com.app.senseaid.screens.home
 import android.content.Context
 import android.util.Log
 import androidx.compose.runtime.*
+import com.app.senseaid.Routes.CATEGORY_SCREEN
 import com.app.senseaid.Routes.LOCATION_SCREEN
-import com.app.senseaid.model.Location
-import com.app.senseaid.model.Review
-import com.app.senseaid.model.SortDirection
-import com.app.senseaid.model.Tags
+import com.app.senseaid.model.*
 import com.app.senseaid.model.repository.FirestoreRepository
 import com.app.senseaid.screens.SenseAidViewModel
-import com.google.firebase.firestore.Query.Direction
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
 @HiltViewModel
@@ -24,54 +21,63 @@ class HomeViewModel @Inject constructor(
     val firestoreRepository: FirestoreRepository
 ) : SenseAidViewModel() {
 
-    val locations: MutableState<Flow<List<Location>>> =
-        mutableStateOf(firestoreRepository.locations)
+    var locations: MutableState<Flow<List<Location>>> =
+        mutableStateOf(emptyFlow())
 
-    var sortSelection by mutableStateOf(SortDirection.ASCENDING)
+    val locationTags = mutableStateListOf<LocationTags>()
+
+    var isSearching by mutableStateOf(false)
         private set
 
-    val selectedTags = mutableStateMapOf<Tags, Boolean>()
+    var searchText by mutableStateOf("")
+        private set
 
-    suspend fun filterLocations() {
-        locations.value = firestoreRepository.getFilteredLocations(selectedTags.filterValues { true }.keys)
-    }
-
-    suspend fun sortLocations() {
-        locations.value = when (sortSelection) {
-            SortDirection.HIGHEST_RATING -> firestoreRepository.getSortedLocations(
-                Direction.DESCENDING,
-                true
-            )
-            SortDirection.LOWEST_RATING -> firestoreRepository.getSortedLocations(
-                Direction.ASCENDING,
-                true
-            )
-            SortDirection.DESCENDING -> firestoreRepository.getSortedLocations(
-                Direction.DESCENDING,
-                false
-            )
-            else -> firestoreRepository.getSortedLocations(Direction.ASCENDING, false)
+    fun getCategoryLocations(
+        tag: CategoryTags?,
+        locationTag: LocationTags?
+    ): MutableState<Flow<List<Location>>> {
+        locations = if (tag == null) {
+            Log.i("getCategoryLocations", "null")
+            mutableStateOf(firestoreRepository.locations)
+        } else {
+            Log.i("getCategoryLocations", "not null")
+            if (locationTag != null) {
+                if (!locationTags.remove(locationTag)) {
+                    locationTags.add(locationTag)
+                }
+            }
+            mutableStateOf(firestoreRepository.getLocationCategory(tag, locationTags.toList()))
         }
+        return locations
     }
 
-    fun onTagSelect(tag: Tags) {
-        selectedTags[tag] = selectedTags[tag] == false || selectedTags[tag] == null
-        Log.d("tag state", "$tag : ${selectedTags[tag]}")
+    fun onCategoryClick(tag: CategoryTags, navToScreen: (String) -> Unit) {
+        Log.i("onCategoryClick", "navigating")
+        navToScreen("${CATEGORY_SCREEN}/{${tag.ordinal}}")
     }
 
-    fun resetSort() {
-        if (selectedTags.containsValue(true)) {
-            onSortByPress(SortDirection.ASCENDING)
-        }
-    }
-
-    fun onSortByPress(newSortDirection: SortDirection) {
-        Log.i("sort selection", newSortDirection.toString())
-        sortSelection = newSortDirection
-    }
-
-    fun onLocationPress(locationId: String, navToScreen: (String) -> Unit) {
+    fun onLocationClick(locationId: String, navToScreen: (String) -> Unit) {
         navToScreen("${LOCATION_SCREEN}/{${locationId}}")
+    }
+
+    fun updateIsSearching() {
+        isSearching = !isSearching
+    }
+
+    fun updateSearchText(input: String) {
+        searchText = input
+    }
+    fun onSearchClick(queryText: String, tag: CategoryTags?): MutableState<Flow<List<Location>>> {
+        locations = mutableStateOf(firestoreRepository.searchLocations(queryText))
+        return locations
+//        launchCatching {
+//            locations = if (tag == null) {
+//                mutableStateOf(firestoreRepository.searchLocations(queryText))
+//            } else {
+//                mutableStateOf(firestoreRepository.searchLocations(queryText, tag, locationTags))
+//            }
+//        }
+
     }
 
     // TODO: Delete or improve

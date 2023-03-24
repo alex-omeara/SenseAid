@@ -14,7 +14,7 @@ import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.content.ContextCompat
-import com.app.senseaid.model.Tags
+import com.app.senseaid.model.LocationTags
 import com.app.senseaid.model.repository.FirestoreRepository
 import com.app.senseaid.screens.SenseAidViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -40,7 +40,7 @@ class AddReviewViewModel @Inject constructor(
     var charsAdded by mutableStateOf(0)
         private set
 
-    val selectedTags = mutableStateMapOf<Tags, Boolean>()
+    val selectedTags = mutableStateMapOf<LocationTags, Boolean>()
 
     var popupState by mutableStateOf(false)
         private set
@@ -104,19 +104,16 @@ class AddReviewViewModel @Inject constructor(
         launchCatching {
             val formattedLocationId = locationId.substring(1, locationId.length - 1)
             val formattedTotalRatings = totalRatings.substring(1, totalRatings.length - 3).toInt()
-            var addSoundRes: String? = null
-            fileName?.let {
-                addSoundRes = storageRepository.addSoundFile(it)
-            }
-
-            firestoreRepository.addReview(
+            val reviewId = firestoreRepository.addReview(
                 author = author,
                 rating = rating.toDouble(),
                 tags = selectedTags.filter { (_, value) -> value }.keys.map { it.toString() },
                 content = reviewContentText,
                 locationId = formattedLocationId,
-                soundRecording = addSoundRes
             )
+            fileName?.let {
+                storageRepository.addSoundFile(it, reviewId)
+            }
             firestoreRepository.updateLocationField(
                 locationId = formattedLocationId,
                 field = "avgRating",
@@ -135,7 +132,7 @@ class AddReviewViewModel @Inject constructor(
         navToScreen()
     }
 
-    fun onTagSelect(tag: Tags) {
+    fun onTagSelect(tag: LocationTags) {
         selectedTags[tag] = selectedTags[tag] == false || selectedTags[tag] == null
         Log.d(TAG, "$tag : ${selectedTags[tag]}")
     }
@@ -166,7 +163,7 @@ class AddReviewViewModel @Inject constructor(
                     it
                 ) == PackageManager.PERMISSION_GRANTED
             }) {
-            fileName = "${context.getExternalFilesDir(Environment.DIRECTORY_RECORDINGS)}/review-sound.3gp"
+            fileName = "${context.getExternalFilesDir(Environment.DIRECTORY_RECORDINGS)}/sound.mp3"
             Log.i(TAG, "started recording")
             startRecording(context)
         } else {
@@ -178,15 +175,15 @@ class AddReviewViewModel @Inject constructor(
         try {
             recorder = MediaRecorder(context).apply {
                 setAudioSource(MediaRecorder.AudioSource.MIC)
-                setOutputFormat(OutputFormat.THREE_GPP)
+                setOutputFormat(OutputFormat.AAC_ADTS)
                 setOutputFile(fileName)
-                setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB)
+                setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
                 prepare()
                 start()
                 timer.start()
             }
         } catch (e: IOException) {
-            Log.e(TAG, e.stackTraceToString())
+            Log.e(TAG, "Failed to prepare MediaRecorder $e")
         } catch (e: IllegalStateException) {
             Log.e(TAG, e.stackTraceToString())
         }

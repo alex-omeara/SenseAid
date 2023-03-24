@@ -3,220 +3,221 @@ package com.app.senseaid.screens.home
 import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.selection.selectable
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.rememberBackdropScaffoldState
-import androidx.compose.material.BackdropScaffold
-import androidx.compose.material.BackdropValue
-import androidx.compose.material.BackdropScaffoldState
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+//import androidx.compose.material.BackdropScaffold
+//import androidx.compose.material.ExperimentalMaterialApi
+//import androidx.compose.material.rememberBackdropScaffoldState
+//import androidx.compose.material.BackdropScaffoldState
+//import androidx.compose.material.BackdropValue
 import androidx.compose.material3.*
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.State
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.snapshots.SnapshotStateMap
-import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.app.senseaid.R
-import com.app.senseaid.common.composable.Sort
-import com.app.senseaid.common.composable.TextTitle
-import com.app.senseaid.model.Location
-import com.app.senseaid.model.Tags
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
+import com.app.senseaid.model.LocationTags
+import com.app.senseaid.model.CategoryTags
+import com.google.firebase.firestore.FirebaseFirestore
 
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(
+fun LocationScreen(
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel(),
-    onItemPress: (String) -> Unit
+    useCategoryTag: CategoryTags? = null,
+    onLocationClick: (String) -> Unit,
+    onBackClick: () -> Unit = {}
 ) {
-    val scaffoldState = rememberBackdropScaffoldState(initialValue = BackdropValue.Revealed)
-    val coroutineScope = rememberCoroutineScope()
-    val locations = viewModel.locations.value.collectAsStateWithLifecycle(emptyList())
 
-    BackdropScaffold(
-        scaffoldState = scaffoldState,
-        headerHeight = 24.dp,
-        stickyFrontLayer = false,
-        gesturesEnabled = false,
-        appBar = {
-            TopAppBar(
-                title = { Text(stringResource(id = R.string.app_name)) },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Gray),
-                actions = {
-                    IconButton(onClick = { /*TODO*/ }) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_baseline_search_24),
-                            contentDescription = stringResource(R.string.back_button)
-                        )
-                    }
-                    IconButton(onClick = {
-                        if (scaffoldState.isConcealed) {
-                            coroutineScope.launch { scaffoldState.reveal() }
-                        } else if (scaffoldState.isRevealed) {
-                            coroutineScope.launch { scaffoldState.conceal() }
-                        }
-                    }) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_baseline_filter_list_24), // TODO: change icon
-                            contentDescription = stringResource(R.string.filter)
-                        )
-                    }
-                }
-            )
-        },
-        backLayerContent = {
-            BackLayerContent(modifier = modifier, onItemPress = onItemPress, locations = locations)
-        },
-        frontLayerContent = {
-            FrontLayerContent(
-                modifier = modifier,
-                coroutineScope = coroutineScope,
-                scaffoldState = scaffoldState,
-            )
-        }) {
+    FirebaseFirestore.getInstance().clearPersistence()
+    val locations =
+        viewModel.getCategoryLocations(useCategoryTag, null).value.collectAsStateWithLifecycle(
+            emptyList()
+        )
 
-    }
-}
-
-@Composable
-fun BackLayerContent(
-    modifier: Modifier,
-    locations: State<List<Location>>,
-    onItemPress: (String) -> Unit
-) {
-    val listState = rememberLazyListState()
-
-    LaunchedEffect(key1 = locations.value.firstOrNull()) { listState.scrollToItem(0) }
-    LazyColumn(
-        modifier = modifier.padding(start = 10.dp, end = 10.dp, top = 10.dp),
-        state = listState
-    ) {
-        items(
-            items = locations.value,
-            key = { it.id }
-        ) { locationItem ->
-            LocationItem(
-                modifier = modifier,
-                location = locationItem,
-                onLocationPress = onItemPress
-            )
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterialApi::class)
-@Composable
-fun FrontLayerContent(
-    modifier: Modifier,
-    coroutineScope: CoroutineScope,
-    scaffoldState: BackdropScaffoldState,
-    viewModel: HomeViewModel = hiltViewModel(),
-) {
-    Column {
-        Row(
-            modifier = modifier.padding(vertical = 12.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            IconButton(onClick = {
-                coroutineScope.launch {
-                    scaffoldState.reveal()
-                    if (viewModel.selectedTags.containsValue(true)) {
-                        viewModel.filterLocations()
-                    } else {
-                        viewModel.sortLocations()
-                    }
-                }
-
-                Log.i("scaffoldState", "isConcealed: ${scaffoldState.isConcealed}")
-            }) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_baseline_close_24),
-                    contentDescription = stringResource(R.string.cancel)
+    Scaffold(
+        topBar = {
+            if (!viewModel.isSearching) {
+                DefaultTopAppBar(
+                    useCategoryTag = useCategoryTag,
+                    onBackClick = onBackClick,
+                    onSearchClick = { viewModel.updateIsSearching() }
+                )
+            } else {
+                SearchAppBar(
+                    text = viewModel.searchText,
+                    useCategoryTag = useCategoryTag,
+                    onTextChange = viewModel::updateSearchText,
+                    onSearchClick =  viewModel::onSearchClick,
+                    onCloseClick = { viewModel.updateIsSearching() }
                 )
             }
-            TextTitle(
-                modifier = modifier.fillMaxWidth(),
-                text = stringResource(id = R.string.filter_and_sort),
-                textAlign = TextAlign.Center
-            )
         }
-        Divider()
-        Sort(
-            modifier = modifier,
-            sortSelection = viewModel.sortSelection,
-            onClick = viewModel::onSortByPress,
-            selectedTags = viewModel.selectedTags
-        )
-        Divider()
-        Filter(
-            modifier = modifier,
-            selectedTags = viewModel.selectedTags,
-            onTagSelect = viewModel::onTagSelect
-        ) { viewModel.resetSort() }
-    }
-}
+    ) { paddingValues ->
 
-@Composable
-fun Filter(
-    modifier: Modifier,
-    selectedTags: SnapshotStateMap<Tags, Boolean>,
-    onTagSelect: (Tags) -> Unit,
-    resetSort: () -> Unit
-) {
-    Row(
-        modifier = modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        TextTitle(
-            modifier = modifier.padding(vertical = 12.dp),
-            text = stringResource(id = R.string.filter),
-        )
-        if (selectedTags.containsValue(true)) {
-            TextButton(onClick = {
-                selectedTags.keys.forEach { selectedTags[it] = false }
-            }) {
-                Text(text = stringResource(id = R.string.clear))
+        Column() {
+            LazyRow(modifier = modifier.padding(paddingValues)) {
+                items(
+                    items = if (useCategoryTag == null) {
+                        val array = CategoryTags.values()
+                        array.sliceArray(IntRange(1, array.size - 1))
+                    } else {
+                        LocationTags.values()
+                    },
+                    key = { it.name }
+                ) { item ->
+                    val color = if (viewModel.locationTags.contains(item) && item is LocationTags) {
+                        ButtonDefaults.filledTonalButtonColors(
+                            contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
+                            containerColor = MaterialTheme.colorScheme.tertiaryContainer
+                        )
+                    } else {
+                        ButtonDefaults.filledTonalButtonColors()
+                    }
+                    FilledTonalButton(
+                        onClick = {
+                            if (useCategoryTag == null) {
+                                viewModel.onCategoryClick(item as CategoryTags, onLocationClick)
+                            } else {
+                                viewModel.launchCatching {
+                                    viewModel.getCategoryLocations(
+                                        useCategoryTag,
+                                        item as LocationTags
+                                    )
+                                }
+                            }
+                        },
+                        modifier = modifier.padding(horizontal = 4.dp),
+                        colors = color
+                    ) {
+                        Text(text = item.toString())
+                    }
+                }
+            }
+            val listState = rememberLazyListState()
+            LaunchedEffect(key1 = locations.value.firstOrNull()) { listState.scrollToItem(0) }
+            LazyColumn(
+                state = listState,
+                modifier = modifier.padding(horizontal = 8.dp)
+            ) {
+                items(
+                    items = locations.value,
+                    key = { it.id }
+                ) { locationItem ->
+                    LocationItem(
+                        modifier = modifier,
+                        location = locationItem,
+                        onLocationPress = onLocationClick
+                    )
+                }
             }
         }
     }
-    enumValues<Tags>().forEach { tag ->
-        Row(
-            modifier = modifier
-                .fillMaxWidth()
-                .selectable(
-                    selected = (selectedTags[tag] ?: false),
-                    onClick = {
-                        onTagSelect(tag)
-                        resetSort()
-                    },
-                    role = Role.Checkbox
-                ),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(text = tag.toString())
-            Checkbox(
-                checked = (selectedTags[tag] ?: false),
-                onCheckedChange = null
-            )
-        }
+}
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
+@Composable
+fun SearchAppBar(
+    text: String,
+    useCategoryTag: CategoryTags?,
+    onTextChange: (String) -> Unit,
+    onSearchClick: (String, CategoryTags?) -> Unit,
+    onCloseClick: () -> Unit
+) {
+    val (focusRequester) = FocusRequester.createRefs()
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
     }
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth(),
+        color = MaterialTheme.colorScheme.primary
+    ) {
+        TextField(
+            modifier = Modifier
+                .fillMaxWidth()
+                .focusRequester(focusRequester),
+            value = text,
+            onValueChange = { onTextChange(it) },
+            placeholder = {
+                Text(
+                    modifier = Modifier.alpha(0.5f),
+                    text = stringResource(id = R.string.searchIcon)
+                )
+            },
+            singleLine = true,
+            leadingIcon = {
+                IconButton(onClick = { /*TODO*/ }) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_baseline_search_24),
+                        contentDescription = stringResource(R.string.back_button)
+                    )
+                }
+            },
+            trailingIcon = {
+                IconButton(onClick = {
+                    if (text.isNotEmpty()) {
+                        onTextChange("")
+                    } else {
+                        onCloseClick()
+                    }
+                }) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_baseline_close_24),
+                        contentDescription = stringResource(R.string.back_button)
+                    )
+                }
+            },
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+            keyboardActions = KeyboardActions(onSearch = { onSearchClick(text, useCategoryTag) }),
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DefaultTopAppBar(
+    useCategoryTag: CategoryTags?,
+    onBackClick: () -> Unit,
+    onSearchClick: () -> Unit
+) {
+    TopAppBar(
+        title = {
+            if (useCategoryTag == null) {
+                Text(stringResource(id = R.string.app_name))
+            }
+        },
+        navigationIcon = {
+            if (useCategoryTag != null) {
+                IconButton(onClick = onBackClick) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_baseline_arrow_back_24),
+                        contentDescription = stringResource(R.string.back_button)
+                    )
+                }
+            }
+        },
+        colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
+    )
 }

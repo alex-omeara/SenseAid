@@ -1,22 +1,27 @@
 package com.app.senseaid.model.repository
 
-import com.app.senseaid.model.Location
-import com.app.senseaid.model.Review
-import com.app.senseaid.model.Tags
+import com.app.senseaid.model.*
 import com.google.firebase.firestore.Query
+import com.google.firebase.firestore.Query.Direction
 import kotlinx.coroutines.flow.Flow
 
 
 interface FirestoreRepository {
     val locations: Flow<List<Location>>
 
-    suspend fun getSortedLocations(sortDirection: Query.Direction, sortByRating: Boolean): Flow<List<Location>>
-
-    suspend fun getFilteredLocations(filters: Set<Tags>/*, sortDirection: Query.Direction, sortByRating: Boolean*/): Flow<List<Location>>
-
     suspend fun getLocation(locationId: String): Location?
 
+    fun getLocationCategory(tag: CategoryTags, filters: List<LocationTags>): Flow<List<Location>>
+
     suspend fun updateLocationField(locationId: String, field: String, value: Any)
+
+    fun searchLocations(queryText: String): Flow<List<Location>>
+
+//    suspend fun searchLocations(
+//        queryText: String,
+//        tag: CategoryTags,
+//        filters: List<LocationTags>
+//    ): Flow<List<Location>>
 
     suspend fun addLocation(title: String, img: String, imgDescription: String)
 
@@ -25,7 +30,7 @@ interface FirestoreRepository {
     suspend fun getReview(locationId: String, reviewUid: String): Review?
 
     suspend fun getSortedReviews(
-        sortDirection: Query.Direction,
+        sortDirection: Direction,
         locationId: String
     ): Flow<List<Review>>
 
@@ -35,8 +40,7 @@ interface FirestoreRepository {
         tags: List<String>,
         content: String,
         locationId: String,
-        soundRecording: String?
-    )
-    // TODO: Add deleteLocationFromFirestore method using firebase docs to do correctly
+    ): String
 
+    // TODO: Add deleteLocationFromFirestore method using firebase docs to do correctly
 }

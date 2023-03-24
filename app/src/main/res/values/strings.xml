@@ -8,6 +8,7 @@
     <string name="add_review_title">Rate Your Experience</string>
     <string name="add_review_content">Would you like to write anything about this place?</string>
     <string name="add_review_author">Author Name</string>
+    <string name="add_filter">Add filter</string>
     <string name="see_full_review_content">See more?</string>
     <string name="cancel">Cancel</string>
     <string name="confirm">Confirm</string>
@@ -16,7 +17,7 @@
     <string name="add_sound_recording">Add Sound Recording?</string>
     <string name="select_tags">Add Some Tags?</string>
     <string name="upload">Upload</string>
-    <string name="click_to_upload">Click here to upload</string>
+    <string name="click_to_upload">Click here to upload sound recording</string>
     <string name="remove">Remove</string>
     <string name="filter">Filter</string>
     <string name="sort_by">Sort by</string>
@@ -25,4 +26,5 @@
     <string name="record_audio">Record microphone audio</string>
     <string name="mic">Mic</string>
     <string name="record_audio_again">Record audio again?</string>
+    <string name="searchIcon">Search</string>
 </resources>

@@ -21,9 +21,9 @@ class StorageRepositoryImpl @Inject constructor(
         return storage.getReference(filePath).downloadUrl
     }
 
-    override suspend fun addSoundFile(filePath: String): String {
+    override suspend fun addSoundFile(filePath: String, reviewId: String) {
         val file = Uri.fromFile(File(filePath))
-        val ref = storage.reference.child("audio/${file.lastPathSegment}")
+        val ref = storage.reference.child("audio/$reviewId-${file.lastPathSegment}")
         val upload = ref.putFile(file)
         upload.addOnCompleteListener {
             if (!it.isSuccessful) {
@@ -32,7 +32,6 @@ class StorageRepositoryImpl @Inject constructor(
                 Log.i(TAG, "successfully uploaded at url: ${ref.downloadUrl}")
             }
         }
-        return ref.path
     }
 
     companion object {

@@ -18,15 +18,18 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.app.senseaid.Routes.ADD_REVIEW_SCREEN
 import com.app.senseaid.Routes.AVERAGE_RATING
+import com.app.senseaid.Routes.CATEGORY_SCREEN
 import com.app.senseaid.Routes.HOME_SCREEN
 import com.app.senseaid.Routes.LOCATION_SCREEN
 import com.app.senseaid.Routes.DEFAULT_ID
+import com.app.senseaid.Routes.LOCATION_CATEGORY
 import com.app.senseaid.Routes.LOCATION_ID
 import com.app.senseaid.Routes.REVIEW_ID
 import com.app.senseaid.Routes.REVIEW_SCREEN
 import com.app.senseaid.Routes.TOTAL_RATING
+import com.app.senseaid.model.CategoryTags
 import com.app.senseaid.screens.add_review.AddReviewContentScreen
-import com.app.senseaid.screens.home.HomeScreen
+import com.app.senseaid.screens.home.LocationScreen
 import com.app.senseaid.screens.location.LocationScreen
 import com.app.senseaid.screens.review.ReviewScreen
 import com.app.senseaid.ui.theme.SenseAidTheme
@@ -37,6 +40,8 @@ object Routes {
     const val DEFAULT_ID = "-1"
     const val LOCATION_SCREEN = "location"
     const val LOCATION_ID = "locationId"
+    const val CATEGORY_SCREEN = "category"
+    const val LOCATION_CATEGORY = "locationCategory"
     const val REVIEW_SCREEN = "review"
     const val REVIEW_ID = "reviewId"
     const val ADD_REVIEW_SCREEN = "addReview"
@@ -44,6 +49,7 @@ object Routes {
     const val AVERAGE_RATING = "avgRating"
 }
 
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SenseAidApp() {
@@ -65,13 +71,25 @@ fun SenseAidApp() {
 fun rememberAppState(
     navController: NavHostController = rememberNavController(),
     coroutineScope: CoroutineScope = rememberCoroutineScope()
-) = remember(navController,coroutineScope) { SenseAidAppState(navController, coroutineScope) }
+) = remember(navController, coroutineScope) { SenseAidAppState(navController, coroutineScope) }
 
-@RequiresApi(Build.VERSION_CODES.S)
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 fun NavGraphBuilder.senseAidGraph(navController: NavHostController) {
     composable(HOME_SCREEN) {
-        HomeScreen(
-            onItemPress = { route -> navController.navigate(route) }
+        LocationScreen(
+            onLocationClick = { route -> navController.navigate(route) }
+        )
+    }
+
+    composable(
+        route = "$CATEGORY_SCREEN/{$LOCATION_CATEGORY}",
+        arguments = listOf(navArgument(LOCATION_CATEGORY) { type = NavType.StringType })
+    ) {
+        LocationScreen(
+            onLocationClick = { route -> navController.navigate(route) },
+            useCategoryTag = it.arguments?.getString(LOCATION_CATEGORY)
+                ?.let { ordinal -> CategoryTags.values()[ordinal.substring(1, ordinal.length-1).toInt()] },
+            onBackClick = { navController.popBackStack() }
         )
     }
 
@@ -81,9 +99,9 @@ fun NavGraphBuilder.senseAidGraph(navController: NavHostController) {
     ) {
         LocationScreen(
             locationId = it.arguments?.getString(LOCATION_ID) ?: DEFAULT_ID,
-            onReviewPress = { route -> navController.navigate(route) },
-            onBackPress = { navController.popBackStack() },
-            onAddReviewPress = { route -> navController.navigate(route) }
+            onReviewClick = { route -> navController.navigate(route) },
+            onBackClick = { navController.popBackStack() },
+            onAddReviewClick = { route -> navController.navigate(route) }
         )
     }
 

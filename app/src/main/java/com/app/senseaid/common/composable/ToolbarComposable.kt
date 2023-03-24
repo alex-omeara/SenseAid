@@ -23,7 +23,6 @@ fun BasicNavToolbar(
 ) {
     TopAppBar(
         title = { Text(text = stringResource(title)) },
-        colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Gray),
         navigationIcon = {
             Box(modifier) {
                 IconButton(onClick = navigationAction) {
@@ -46,7 +45,7 @@ fun BasicActionBar(
     FloatingActionButton(
         onClick = fabAction,
         shape = CircleShape,
-        containerColor = Color.Cyan
+        containerColor = MaterialTheme.colorScheme.primary
     ) {
         Icon(
             painter = painterResource(id = actionIcon),

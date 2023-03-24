@@ -1,5 +1,6 @@
 package com.app.senseaid.screens.location
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -12,6 +13,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -24,18 +26,21 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.app.senseaid.R
 import com.app.senseaid.common.composable.*
+import com.app.senseaid.model.LocationTags
 import com.app.senseaid.model.SortDirection
 import com.app.senseaid.screens.review.ReviewItem
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import com.bumptech.glide.integration.compose.GlideImage
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalGlideComposeApi::class)
 @Composable
 fun LocationScreen(
     modifier: Modifier = Modifier,
     locationId: String,
     viewModel: LocationViewModel = hiltViewModel(),
-    onReviewPress: (String) -> Unit,
-    onBackPress: () -> Unit,
-    onAddReviewPress: (String) -> Unit
+    onReviewClick: (String) -> Unit,
+    onBackClick: () -> Unit,
+    onAddReviewClick: (String) -> Unit
 ) {
     val location by viewModel.location
 
@@ -45,9 +50,8 @@ fun LocationScreen(
         topBar = {
             TopAppBar(
                 title = {},
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Gray),
                 navigationIcon = {
-                    IconButton(onClick = onBackPress) {
+                    IconButton(onClick = onBackClick) {
                         Icon(
                             painter = painterResource(id = R.drawable.ic_baseline_arrow_back_24),
                             contentDescription = stringResource(R.string.back_button)
@@ -61,18 +65,20 @@ fun LocationScreen(
             BasicActionBar(
                 actionIcon = R.drawable.ic_baseline_add_24,
                 actionDesc = R.string.add_review,
-                fabAction = { viewModel.onAddReview(location, onAddReviewPress) }
+                fabAction = { viewModel.onAddReview(location, onAddReviewClick) }
             )
         }
     ) { paddingValues ->
         Column(
             modifier = modifier
                 .padding(paddingValues)
+                .background(MaterialTheme.colorScheme.secondaryContainer)
         ) {
-            LocationImage(
+            GlideImage(
                 modifier = modifier.height(200.dp),
-                imgStorageReference = viewModel.getLocationImage(location.imgPath),
-                imgDesc = location.imgDesc,
+                model = viewModel.getLocationImage(location.imgPath),
+                contentDescription = location.imgDesc,
+                contentScale = ContentScale.FillWidth
             )
             val reviews = viewModel.reviews.value.collectAsStateWithLifecycle(emptyList())
 
@@ -87,7 +93,7 @@ fun LocationScreen(
                 topTags = location.top_tags
             )
             Divider()
-            Box() {
+            Box(contentAlignment = Alignment.Center) {
                 SmallTextTitle(
                     modifier = modifier.clickable(
                         role = Role.DropdownList,
@@ -97,26 +103,31 @@ fun LocationScreen(
                     textAlign = TextAlign.End
                 )
                 DropdownMenu(
-                    expanded = viewModel.isSortReviews,
-                    onDismissRequest = {
-                        viewModel.toggleSortReviews()
-                        viewModel.launchCatching {
-                            viewModel.sortReviews()
-                        }
-                    },
+                    expanded = viewModel.isSorting,
+                    onDismissRequest = { viewModel.toggleSortReviews() },
                     offset = DpOffset(260.dp, 0.dp)
                 ) {
-                    Sort(
-                        modifier = modifier,
-                        sortSelection = viewModel.sortSelection,
-                        excludeDirection = listOf(SortDirection.ASCENDING, SortDirection.DESCENDING),
-                        onClick = viewModel::onSortByPress
-                    )
+                    enumValues<SortDirection>().forEach { direction ->
+                        if (direction != SortDirection.ASCENDING && direction != SortDirection.DESCENDING) {
+                            DropdownMenuItem(
+                                text = { Text(text = direction.toString()) },
+                                onClick = {
+                                    viewModel.toggleSortReviews()
+                                    viewModel.launchCatching { viewModel.sortReviews(direction) }
+                                }
+                            )
+                        }
+                    }
+
                 }
             }
             val listState = rememberLazyListState()
             LaunchedEffect(key1 = reviews.value.firstOrNull()) { listState.scrollToItem(0) }
-            LazyColumn(modifier = modifier.padding(horizontal = 10.dp), state = listState) {
+            LazyColumn(
+                modifier = modifier
+                    .background(MaterialTheme.colorScheme.primaryContainer)
+                    .padding(horizontal = 10.dp), state = listState
+            ) {
                 items(
                     items = reviews.value,
                     key = { it.id }
@@ -128,7 +139,7 @@ fun LocationScreen(
                         viewModel.onReviewPress(
                             location.id,
                             reviewItem.id,
-                            onReviewPress
+                            onReviewClick
                         )
                     }
                 }
@@ -142,7 +153,7 @@ fun RatingInfo(
     modifier: Modifier = Modifier,
     averageRating: Double,
     totalReviews: Int,
-    topTags: List<String>
+    topTags: List<LocationTags>
 ) {
     Row(
         modifier = modifier
@@ -152,14 +163,11 @@ fun RatingInfo(
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Row(horizontalArrangement = Arrangement.Center) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_round_star_24),
-                contentDescription = stringResource(R.string.star_desc),
-                tint = Color.Unspecified
-            )
-            Text(text = "$averageRating ($totalReviews)")
-        }
+        RatingText(
+            modifier = modifier,
+            averageRating = averageRating,
+            totalReviews = totalReviews
+        )
         if (topTags.isNotEmpty()) {
             Divider(
                 modifier = modifier
@@ -167,7 +175,7 @@ fun RatingInfo(
                     .width(1.dp)
             )
             Text(
-                text = topTags[0],
+                text = topTags[0].toString(),
                 textAlign = TextAlign.Center
             )
             Divider(
@@ -176,7 +184,7 @@ fun RatingInfo(
                     .width(1.dp)
             )
             Text(
-                text = topTags[1],
+                text = topTags[1].toString(),
                 textAlign = TextAlign.Center
             )
         }
@@ -191,6 +199,6 @@ fun RatingbarPreview() {
     RatingInfo(
         averageRating = 3.2,
         totalReviews = 14,
-        topTags = listOf("Bright lights", "Many people")
+        topTags = listOf(LocationTags.ASD_FRIENDLY, LocationTags.LOW_LIGHTS)
     )
 }

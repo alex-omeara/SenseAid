@@ -1,9 +1,7 @@
 package com.app.senseaid.screens.location
 
 import android.content.Context
-import android.media.AudioAttributes
 import android.media.MediaPlayer
-import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
@@ -16,36 +14,30 @@ import com.app.senseaid.model.Location
 import com.app.senseaid.model.Review
 import com.app.senseaid.model.SortDirection
 import com.app.senseaid.model.repository.FirestoreRepository
-import com.app.senseaid.model.repository.StorageRepository
 import com.app.senseaid.screens.SenseAidViewModel
-import com.google.firebase.firestore.Query
+import com.google.firebase.firestore.Query.Direction
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
+
 @HiltViewModel
 class LocationViewModel @Inject constructor(
-    private val firestoreRepository: FirestoreRepository,
-    storageRepository: StorageRepository
+    private val firestoreRepository: FirestoreRepository
 ) : SenseAidViewModel() {
     val location = mutableStateOf(Location())
 
     val reviews: MutableState<Flow<List<Review>>> =
         mutableStateOf(emptyFlow())
 
-    var isSortReviews by mutableStateOf(false)
+    var isSorting by mutableStateOf(false)
         private set
 
     var sortSelection by mutableStateOf(SortDirection.ASCENDING)
         private set
 
     fun toggleSortReviews() {
-        isSortReviews = !isSortReviews
-    }
-
-    fun onSortByPress(newSortDirection: SortDirection) {
-        Log.i("sort selection", newSortDirection.toString())
-        sortSelection = newSortDirection
+        isSorting = !isSorting
     }
 
     fun initialise(locationId: String) {
@@ -53,19 +45,17 @@ class LocationViewModel @Inject constructor(
             if (locationId != DEFAULT_ID) {
                 val uid = locationId.substring(1, locationId.length - 1)
                 location.value = firestoreRepository.getLocation(uid) ?: Location()
-//                reviews = firestoreRepository.getReviews(uid)
                 reviews.value = firestoreRepository.getReviews(uid)
             }
         }
     }
 
-    suspend fun sortReviews() {
-        reviews.value = when (sortSelection) {
-            SortDirection.LOWEST_RATING -> firestoreRepository.getSortedReviews(
-                Query.Direction.ASCENDING,
-                location.value.id
-            )
-            else -> firestoreRepository.getSortedReviews(Query.Direction.DESCENDING, location.value.id)
+    suspend fun sortReviews(newSortDirection: SortDirection) {
+        sortSelection = newSortDirection
+        reviews.value = if (sortSelection == SortDirection.HIGHEST_RATING) {
+            firestoreRepository.getSortedReviews(Direction.DESCENDING, location.value.id)
+        } else {
+            firestoreRepository.getSortedReviews(Direction.ASCENDING, location.value.id)
         }
     }
 
@@ -78,20 +68,25 @@ class LocationViewModel @Inject constructor(
     }
 
     fun startPlaying(context: Context, filePath: String) {
+        Log.i("MediaPlayer", "filePath: $filePath")
         storageRepository.getFileDownloadUri(filePath).addOnSuccessListener {
             var mediaPlayer = MediaPlayer().apply {
-                setAudioAttributes(
-                    AudioAttributes.Builder()
-                        .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
-                        .setUsage(AudioAttributes.USAGE_MEDIA)
-                        .build()
-                )
-                Log.i("asd", it.toString())
-                setDataSource(it.toString())
+//                setAudioAttributes(
+//                    AudioAttributes.Builder()
+//                        .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+//                        .setUsage(AudioAttributes.USAGE_MEDIA)
+//                        .build()
+//                )
+                Log.i("MediaPlayer", "url: $it")
+                setDataSource(context, it)
                 prepare()
                 start()
             }
         }
+    }
 
+    fun startPlayingLocalFile(context: Context, file: Int) {
+        val m = MediaPlayer.create(context, file)
+        m.start()
     }
 }

@@ -10,7 +10,6 @@ import androidx.compose.foundation.text.BasicText
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -29,11 +28,12 @@ fun ReviewItem(
     context: Context,
     onReviewPress: () -> Unit
 ) {
-    Card( // TODO: Make into expandable card?
+    Card(
         modifier = modifier.padding(vertical = 6.dp),
         shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        onClick = onReviewPress
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
+        onClick = onReviewPress,
+        elevation = CardDefaults.cardElevation(2.dp)
     ) {
         Row {
             Column(modifier = modifier
@@ -48,11 +48,12 @@ fun ReviewItem(
                     overflow = TextOverflow.Ellipsis
                 )
             }
-            Log.i("ReviewItem", "${review.sound_recording}")
-            Log.i("ReviewItem", "gs://senseaid-895bb.appspot.com/audio/file_example_MP3_700KB.mp3")
             if (review.sound_recording != null) {
+                Log.i("ReviewItem", "sound url: ${review.sound_recording}")
                 IconButton(modifier = modifier.weight(1f),
-                    onClick = { viewModel.startPlaying(context, review.sound_recording) }) {
+                    onClick = {
+                        viewModel.startPlaying(context, "/audio/${review.id}-sound.mp3")
+                    }) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_baseline_play_arrow_24),
                         contentDescription = "play arrow"

@@ -11,5 +11,5 @@ interface StorageRepository {
 
     fun getFileDownloadUri(filePath: String): Task<Uri>
 
-    suspend fun addSoundFile(filePath: String): String
+    suspend fun addSoundFile(filePath: String, reviewId: String)
 }

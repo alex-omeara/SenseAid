@@ -2,27 +2,12 @@ package com.app.senseaid.common.composable
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-
-@Composable
-fun BasicTextButton(
-    @StringRes text: Int,
-    modifier: Modifier,
-    action: () -> Unit
-) {
-    TextButton(onClick = action, modifier) {
-        Text(text = stringResource(text))
-    }
-}
+import androidx.compose.ui.unit.dp
 
 @Composable
 fun IconTextButton(
@@ -46,16 +31,17 @@ fun BasicButton(
     @StringRes text: Int,
     modifier: Modifier,
     enabled: Boolean = true,
-    action: () -> Unit
+    onClick: () -> Unit
 ) {
     Button(
-        onClick = action,
+        onClick = onClick,
         modifier = modifier,
-        colors = ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.primary,
-            contentColor = MaterialTheme.colorScheme.onPrimary
-        ),
-        enabled = enabled
+//        colors = ButtonDefaults.buttonColors(
+//            containerColor = MaterialTheme.colorScheme.primary,
+//            contentColor = MaterialTheme.colorScheme.onPrimary
+//        ),
+        enabled = enabled,
+        elevation = ButtonDefaults.buttonElevation(4.dp)
     ) {
         Text(text = stringResource(text))
     }

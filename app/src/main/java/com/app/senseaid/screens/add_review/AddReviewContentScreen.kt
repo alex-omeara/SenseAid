@@ -9,30 +9,39 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
+import android.view.KeyEvent
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.app.senseaid.R
 import com.app.senseaid.common.composable.*
 import com.app.senseaid.common.popup.CenterWindowOffsetPositionProvider
-import com.app.senseaid.model.Tags
+import com.app.senseaid.model.LocationTags
 import com.gowtham.ratingbar.RatingBar
 import com.gowtham.ratingbar.RatingBarConfig
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 fun AddReviewContentScreen(
     modifier: Modifier = Modifier,
@@ -55,11 +64,13 @@ fun AddReviewContentScreen(
         }
     ) { paddingValues ->
         Column(
-            modifier = modifier.padding(
-                top = paddingValues.calculateTopPadding(),
-                start = 15.dp,
-                end = 15.dp
-            ),
+            modifier = modifier
+                .background(MaterialTheme.colorScheme.primaryContainer)
+                .padding(
+                    top = paddingValues.calculateTopPadding(),
+                    start = 15.dp,
+                    end = 15.dp
+                ),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             TextTitle(
@@ -76,11 +87,9 @@ fun AddReviewContentScreen(
 
             TagsRow(modifier = modifier)
 
-            SmallTextTitle(modifier = modifier, text = stringResource(R.string.add_sound_recording))
-
             UploadMedia(
                 modifier = modifier,
-                contentColor = Color.LightGray,
+                contentColor = MaterialTheme.colorScheme.secondary,
                 shape = RoundedCornerShape(10.dp),
                 icon = R.drawable.ic_baseline_cloud_upload_24,
                 iconDescription = R.string.upload,
@@ -91,27 +100,45 @@ fun AddReviewContentScreen(
                 iconRes = R.drawable.ic_baseline_mic_24,
                 iconDesc = R.string.mic,
             )
+            val (focusRequester) = FocusRequester.createRefs()
             OutlinedTextField(
+                modifier = modifier.fillMaxWidth().onKeyEvent {
+                    if (it.nativeKeyEvent.keyCode == KeyEvent.KEYCODE_ENTER) {
+                        focusRequester.requestFocus()
+                        true
+                    }
+                    false
+                },
                 placeholder = { Text(text = stringResource(id = R.string.add_review_author)) },
                 value = viewModel.reviewAuthor,
-                onValueChange = { viewModel.updateReviewAuthor(it) }
+                onValueChange = { viewModel.updateReviewAuthor(it) },
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                keyboardActions = KeyboardActions(onDone = { focusRequester.requestFocus() })
             )
-            CharRemainingField(
-                text = R.string.add_review_content,
-                charsRemaining = R.string.chars_remaining,
+            OutlinedTextField(
+                modifier = modifier.fillMaxWidth().focusRequester(focusRequester),
                 value = viewModel.reviewContentText,
-                modifier = modifier,
-                charsAdded = viewModel.charsAdded,
-                onValueChange = viewModel::updateReviewContent
+                onValueChange = { viewModel.updateReviewContent(it) },
+                placeholder = { Text(stringResource(R.string.add_review_content)) },
+                supportingText = { Text("${400 - viewModel.charsAdded} ${stringResource(R.string.chars_remaining)}") },
+                minLines = 7,
+                maxLines = 7,
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                keyboardActions = KeyboardActions(onDone = { viewModel.onSubmit(
+                    locationId = locationId,
+                    totalRatings = totalRatings,
+                    avgRating = avgRating,
+                    author = viewModel.reviewAuthor,
+                    navToScreen = onSubmitPress
+                ) })
             )
-
             // TODO: Move to bottom of screen (custom layout not BottomAppBar)
             BasicButton(text = R.string.submit, modifier = modifier.fillMaxWidth()) {
                 viewModel.onSubmit(
                     locationId = locationId,
                     totalRatings = totalRatings,
                     avgRating = avgRating,
-                    author = "me",
+                    author = viewModel.reviewAuthor,
                     navToScreen = onSubmitPress
                 )
             }
@@ -126,9 +153,7 @@ fun TagsRow(
     viewModel: AddReviewViewModel = hiltViewModel()
 ) {
     FlowRow {
-        BasicButton(text = R.string.select_tags, modifier = modifier) {
-            viewModel.onPopup()
-        }
+        BasicButton(text = R.string.select_tags, modifier = modifier) { viewModel.onPopup() }
         if (viewModel.popupState) {
             Popup(
                 onDismissRequest = { viewModel.onPopup() },
@@ -144,7 +169,7 @@ fun TagsRow(
                         horizontalArrangement = Arrangement.Start
                     ) {
                         val selectedTags = viewModel.selectedTags
-                        enumValues<Tags>().forEach { tag ->
+                        enumValues<LocationTags>().forEach { tag ->
                             val color =
                                 if (selectedTags[tag] == true) Color.Green else Color.Blue
                             Button(
