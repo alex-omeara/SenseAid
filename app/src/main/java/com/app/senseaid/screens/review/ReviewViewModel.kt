@@ -1,6 +1,11 @@
 package com.app.senseaid.screens.review
 
+import android.media.MediaPlayer
+import android.os.CountDownTimer
+import android.util.Log
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import com.app.senseaid.Routes.DEFAULT_ID
 import com.app.senseaid.model.Review
 import com.app.senseaid.model.repository.FirestoreRepository
@@ -23,5 +28,10 @@ class ReviewViewModel @Inject constructor(
                 ) ?: Review()
             }
         }
+    }
+
+    companion object {
+        const val COUNTER_STEP = 1000L
+        private const val TAG = "ReviewViewModel"
     }
 }

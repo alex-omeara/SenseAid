@@ -1,26 +1,25 @@
 package com.app.senseaid.common.composable
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.app.senseaid.R
-import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
-import com.bumptech.glide.integration.compose.GlideImage
-import com.google.firebase.storage.StorageReference
+import com.google.firebase.Timestamp
 
 @Composable
 fun TextTitle(
@@ -33,7 +32,6 @@ fun TextTitle(
         text = text,
         modifier = modifier,
         style = MaterialTheme.typography.titleLarge,
-        fontWeight = FontWeight.Bold,
         textAlign = textAlign,
         color = color
     )
@@ -48,9 +46,7 @@ fun SmallTextTitle(
 ) {
     Text(
         text = text,
-        modifier = modifier
-            .padding(5.dp)
-            .fillMaxWidth(),
+        modifier = modifier,
         style = MaterialTheme.typography.titleSmall,
         color = color,
         textAlign = textAlign
@@ -66,7 +62,6 @@ fun RatingText(
     Row(
         modifier = modifier
             .fillMaxHeight(),
-//            .border(2.dp, Color.Black),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -75,7 +70,33 @@ fun RatingText(
             contentDescription = stringResource(R.string.star_desc),
             tint = Color.Unspecified
         )
-        val reviewNum = if (totalReviews != null) { "($totalReviews)" } else { "" }
+        val reviewNum = if (totalReviews != null) {
+            "($totalReviews)"
+        } else {
+            ""
+        }
         Text(text = "$averageRating $reviewNum")
     }
+}
+
+@Composable
+fun ReviewTimeSinceText(
+    modifier: Modifier = Modifier,
+    timestamp: Timestamp,
+    getTimeSinceReview: (Timestamp) -> String,
+    style: TextStyle = LocalTextStyle.current
+) {
+    val timeSinceReview = getTimeSinceReview(timestamp)
+    val text = if (timeSinceReview.isEmpty()) {
+        " - Just now"
+    } else {
+        " - $timeSinceReview ago"
+    }
+    Text(
+        modifier = modifier,
+        text = text,
+        color = Color.Unspecified.copy(0.5f),
+        fontStyle = FontStyle(1),
+        style = style
+    )
 }

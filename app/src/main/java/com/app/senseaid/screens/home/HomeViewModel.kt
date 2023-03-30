@@ -1,13 +1,24 @@
 package com.app.senseaid.screens.home
 
+import android.annotation.SuppressLint
 import android.content.Context
+import android.os.Looper
 import android.util.Log
+import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.compose.runtime.*
 import com.app.senseaid.Routes.CATEGORY_SCREEN
 import com.app.senseaid.Routes.LOCATION_SCREEN
 import com.app.senseaid.model.*
 import com.app.senseaid.model.repository.FirestoreRepository
 import com.app.senseaid.screens.SenseAidViewModel
+import com.firebase.geofire.GeoFireUtils
+import com.firebase.geofire.GeoLocation
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.gson.Gson
@@ -18,35 +29,72 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    val firestoreRepository: FirestoreRepository
+    val firestoreRepository: FirestoreRepository,
 ) : SenseAidViewModel() {
+    var curGeoLocation by mutableStateOf(GeoLocation(0.0, 0.0))
+        private set
+    var locationCallback: LocationCallback? = null
+    var fusedLocationClient: FusedLocationProviderClient? = null
 
-    var locations: MutableState<Flow<List<Location>>> =
+    private var locations: MutableState<Flow<List<Location>>> =
         mutableStateOf(emptyFlow())
 
-    val locationTags = mutableStateListOf<LocationTags>()
+    val sensoryTags = mutableStateListOf<SensoryTags>()
 
-    var isSearching by mutableStateOf(false)
-        private set
+    fun getLatLong(
+        context: Context,
+        permissions: Array<String>,
+        launcher: ManagedActivityResultLauncher<Array<String>, Map<String, Boolean>>
+    ) {
+        if (checkAndRequestPermission(
+                context = context,
+                permissions = permissions,
+                launcher = launcher
+            )) {
+            fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
+            locationCallback = object : LocationCallback() {
+                override fun onLocationResult(p0: LocationResult) {
+                    for (loc in p0.locations) {
+                        curGeoLocation = GeoLocation(loc.latitude, loc.longitude)
+//                        Log.i("curGeoLocation", curGeoLocation.toString())
+                    }
+                }
+            }
+            startLocationUpdates()
+        }
+    }
+    @SuppressLint("MissingPermission")
+    fun startLocationUpdates() {
+        locationCallback?.let {
+            val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 300)
+//                .setMinUpdateIntervalMillis(180000)
+                .build()
+            fusedLocationClient?.requestLocationUpdates(
+                locationRequest,
+                it,
+                Looper.getMainLooper()
+            )
+        }
+    }
 
-    var searchText by mutableStateOf("")
-        private set
+    fun getLocationDistance(location: Location): Double {
+        val geoLocation = GeoLocation(location.coordinates.latitude, location.coordinates.longitude)
+        return GeoFireUtils.getDistanceBetween(geoLocation, curGeoLocation) / 1000
+    }
 
     fun getCategoryLocations(
         tag: CategoryTags?,
-        locationTag: LocationTags?
+        locationTag: SensoryTags?
     ): MutableState<Flow<List<Location>>> {
         locations = if (tag == null) {
-            Log.i("getCategoryLocations", "null")
             mutableStateOf(firestoreRepository.locations)
         } else {
-            Log.i("getCategoryLocations", "not null")
             if (locationTag != null) {
-                if (!locationTags.remove(locationTag)) {
-                    locationTags.add(locationTag)
+                if (!sensoryTags.remove(locationTag)) {
+                    sensoryTags.add(locationTag)
                 }
             }
-            mutableStateOf(firestoreRepository.getLocationCategory(tag, locationTags.toList()))
+            mutableStateOf(firestoreRepository.getLocationCategory(tag, sensoryTags.toList()))
         }
         return locations
     }
@@ -57,27 +105,8 @@ class HomeViewModel @Inject constructor(
     }
 
     fun onLocationClick(locationId: String, navToScreen: (String) -> Unit) {
+        Log.i("onLocationClick", "navigating")
         navToScreen("${LOCATION_SCREEN}/{${locationId}}")
-    }
-
-    fun updateIsSearching() {
-        isSearching = !isSearching
-    }
-
-    fun updateSearchText(input: String) {
-        searchText = input
-    }
-    fun onSearchClick(queryText: String, tag: CategoryTags?): MutableState<Flow<List<Location>>> {
-        locations = mutableStateOf(firestoreRepository.searchLocations(queryText))
-        return locations
-//        launchCatching {
-//            locations = if (tag == null) {
-//                mutableStateOf(firestoreRepository.searchLocations(queryText))
-//            } else {
-//                mutableStateOf(firestoreRepository.searchLocations(queryText, tag, locationTags))
-//            }
-//        }
-
     }
 
     // TODO: Delete or improve

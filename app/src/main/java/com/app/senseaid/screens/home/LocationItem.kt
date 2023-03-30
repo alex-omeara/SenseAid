@@ -3,10 +3,11 @@ package com.app.senseaid.screens.home
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -47,17 +48,20 @@ fun LocationItem(
             )
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 RatingText(
-                    modifier = modifier.weight(1f),
+                    modifier = modifier,
                     averageRating = location.avgRating,
                     totalReviews = null
                 )
-                Spacer(modifier = Modifier.weight(1f))
-                TextTitle(
-                    modifier = modifier.weight(3f),
-                    text = location.title,
+                TextTitle(text = location.title)
+                var distance by remember { mutableStateOf(0.0) }
+                distance = viewModel.getLocationDistance(location)
+                Text(
+                    color = Color.Unspecified.copy(0.5f),
+                    text = "${String.format("%.1f", distance)} km"
                 )
             }
         }

@@ -1,15 +1,15 @@
 package com.app.senseaid.model
 
-enum class LocationTags {
-    LOUD_SOUNDS,
-    QUIET_SOUNDS,
-    SOFT_LIGHTS,
-    HARSH_LIGHTS,
-    LOW_LIGHTS,
-    BRIGHT_LIGHTS,
-    ASD_FRIENDLY,
-    FEW_PEOPLE,
-    MANY_PEOPLE;
+enum class SensoryTags(val isPositive: Boolean) {
+    LOUD_SOUNDS(false),
+    QUIET_SOUNDS(true),
+    SOFT_LIGHTS(true),
+    HARSH_LIGHTS(false),
+    LOW_LIGHTS(true),
+    BRIGHT_LIGHTS(false),
+    ASD_FRIENDLY(true),
+    FEW_PEOPLE(true),
+    MANY_PEOPLE(false);
 
     override fun toString(): String {
         return name.lowercase().split('_')

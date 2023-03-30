@@ -1,20 +1,22 @@
 package com.app.senseaid.screens.review
 
 import android.content.Context
-import android.util.Log
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.padding
+import android.net.Uri
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.app.senseaid.R
+import com.app.senseaid.common.composable.AudioPlayer
+import com.app.senseaid.common.composable.ReviewTimeSinceText
 import com.app.senseaid.model.Review
 import com.app.senseaid.common.composable.SmallTextTitle
 import com.app.senseaid.screens.location.LocationViewModel
@@ -35,12 +37,31 @@ fun ReviewItem(
         onClick = onReviewPress,
         elevation = CardDefaults.cardElevation(2.dp)
     ) {
-        Row {
-            Column(modifier = modifier
-                .padding(12.dp)
-                .weight(3f)) {
-                SmallTextTitle(modifier = modifier, text = review.author)
-                Text(text = "${review.rating} / 5")
+        Row(
+            modifier = modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column(
+                modifier = modifier
+                    .padding(12.dp)
+                    .weight(3f)
+            ) {
+                Row(
+                    modifier = modifier,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    SmallTextTitle(modifier = modifier.heightIn(max = 20.dp), text = review.author)
+                    if (review.timestamp != null) {
+                        ReviewTimeSinceText(
+                            modifier = modifier.padding(5.dp),
+                            timestamp = review.timestamp,
+                            getTimeSinceReview = viewModel::getTimeSinceReview,
+                            style = MaterialTheme.typography.titleSmall
+                        )
+                    }
+                }
+                Text(text = "${review.rating.toInt()} / 5")
                 BasicText(
                     text = review.content,
                     softWrap = true,
@@ -49,16 +70,15 @@ fun ReviewItem(
                 )
             }
             if (review.sound_recording != null) {
-                Log.i("ReviewItem", "sound url: ${review.sound_recording}")
-                IconButton(modifier = modifier.weight(1f),
-                    onClick = {
-                        viewModel.startPlaying(context, "/audio/${review.id}-sound.mp3")
-                    }) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_baseline_play_arrow_24),
-                        contentDescription = "play arrow"
-                    )
-                }
+                val soundFileName = viewModel.getFileName(Uri.parse(review.sound_recording), context, false)
+                AudioPlayer(
+                    modifier = modifier,
+                    checked = (viewModel.isPlaying && !viewModel.isPaused),
+                    onCheckedChange = {
+                        if (it) viewModel.startPlayer(context, "/audio/${review.id}-$soundFileName")
+                        else viewModel.pausePlayer()
+                    }
+                )
             }
         }
 

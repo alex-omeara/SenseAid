@@ -1,20 +1,16 @@
 package com.app.senseaid.model
 
+import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentId
-import com.google.gson.annotations.SerializedName
 
 data class Review(
     @DocumentId
     val id: String = "",
-    @SerializedName("title")
     val title: String = "",
-    @SerializedName("author")
     val author: String = "",
-    @SerializedName("rating")
     val rating: Double = 0.0,
-    @SerializedName("tags")
     val tags: List<String> = emptyList(),
-    @SerializedName("content")
     val content: String = "",
-    val sound_recording: String? = null
+    val sound_recording: String? = null,
+    val timestamp: Timestamp? = null
 )

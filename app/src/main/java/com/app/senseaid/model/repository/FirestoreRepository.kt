@@ -1,7 +1,6 @@
 package com.app.senseaid.model.repository
 
 import com.app.senseaid.model.*
-import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.Query.Direction
 import kotlinx.coroutines.flow.Flow
 
@@ -11,17 +10,9 @@ interface FirestoreRepository {
 
     suspend fun getLocation(locationId: String): Location?
 
-    fun getLocationCategory(tag: CategoryTags, filters: List<LocationTags>): Flow<List<Location>>
+    fun getLocationCategory(tag: CategoryTags, filters: List<SensoryTags>): Flow<List<Location>>
 
     suspend fun updateLocationField(locationId: String, field: String, value: Any)
-
-    fun searchLocations(queryText: String): Flow<List<Location>>
-
-//    suspend fun searchLocations(
-//        queryText: String,
-//        tag: CategoryTags,
-//        filters: List<LocationTags>
-//    ): Flow<List<Location>>
 
     suspend fun addLocation(title: String, img: String, imgDescription: String)
 

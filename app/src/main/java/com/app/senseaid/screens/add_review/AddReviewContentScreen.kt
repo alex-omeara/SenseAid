@@ -1,6 +1,7 @@
 package com.app.senseaid.screens.add_review
 
 import android.Manifest
+import android.content.Context
 import android.os.Build
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -36,7 +37,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.app.senseaid.R
 import com.app.senseaid.common.composable.*
 import com.app.senseaid.common.popup.CenterWindowOffsetPositionProvider
-import com.app.senseaid.model.LocationTags
+import com.app.senseaid.model.SensoryTags
 import com.gowtham.ratingbar.RatingBar
 import com.gowtham.ratingbar.RatingBarConfig
 
@@ -52,6 +53,7 @@ fun AddReviewContentScreen(
     onBackPress: () -> Unit,
     onSubmitPress: () -> Unit
 ) {
+    val context = LocalContext.current
     Scaffold(
         topBar = {
             BasicNavToolbar(
@@ -77,7 +79,6 @@ fun AddReviewContentScreen(
                 modifier = modifier.fillMaxWidth(),
                 text = stringResource(R.string.add_review_title)
             )
-
             RatingBar(
                 value = viewModel.rating,
                 config = RatingBarConfig().size(48.dp),
@@ -89,26 +90,30 @@ fun AddReviewContentScreen(
 
             UploadMedia(
                 modifier = modifier,
+                context = context,
                 contentColor = MaterialTheme.colorScheme.secondary,
                 shape = RoundedCornerShape(10.dp),
                 icon = R.drawable.ic_baseline_cloud_upload_24,
                 iconDescription = R.string.upload,
-                mediaAction = R.string.click_to_upload,
-                setSoundUri = viewModel::setSoundUri
+                mediaText = R.string.click_to_upload,
+                setUploadedFile = viewModel::setUploadedFile
             )
             RecordButton(
                 iconRes = R.drawable.ic_baseline_mic_24,
                 iconDesc = R.string.mic,
+                context = context
             )
             val (focusRequester) = FocusRequester.createRefs()
             OutlinedTextField(
-                modifier = modifier.fillMaxWidth().onKeyEvent {
-                    if (it.nativeKeyEvent.keyCode == KeyEvent.KEYCODE_ENTER) {
-                        focusRequester.requestFocus()
-                        true
-                    }
-                    false
-                },
+                modifier = modifier
+                    .fillMaxWidth()
+                    .onKeyEvent {
+                        if (it.nativeKeyEvent.keyCode == KeyEvent.KEYCODE_ENTER) {
+                            focusRequester.requestFocus()
+                            true
+                        }
+                        false
+                    },
                 placeholder = { Text(text = stringResource(id = R.string.add_review_author)) },
                 value = viewModel.reviewAuthor,
                 onValueChange = { viewModel.updateReviewAuthor(it) },
@@ -116,7 +121,9 @@ fun AddReviewContentScreen(
                 keyboardActions = KeyboardActions(onDone = { focusRequester.requestFocus() })
             )
             OutlinedTextField(
-                modifier = modifier.fillMaxWidth().focusRequester(focusRequester),
+                modifier = modifier
+                    .fillMaxWidth()
+                    .focusRequester(focusRequester),
                 value = viewModel.reviewContentText,
                 onValueChange = { viewModel.updateReviewContent(it) },
                 placeholder = { Text(stringResource(R.string.add_review_content)) },
@@ -124,13 +131,15 @@ fun AddReviewContentScreen(
                 minLines = 7,
                 maxLines = 7,
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                keyboardActions = KeyboardActions(onDone = { viewModel.onSubmit(
-                    locationId = locationId,
-                    totalRatings = totalRatings,
-                    avgRating = avgRating,
-                    author = viewModel.reviewAuthor,
-                    navToScreen = onSubmitPress
-                ) })
+                keyboardActions = KeyboardActions(onDone = {
+                    viewModel.onSubmit(
+                        locationId = locationId,
+                        totalRatings = totalRatings,
+                        avgRating = avgRating,
+                        author = viewModel.reviewAuthor,
+                        navToScreen = onSubmitPress
+                    )
+                })
             )
             // TODO: Move to bottom of screen (custom layout not BottomAppBar)
             BasicButton(text = R.string.submit, modifier = modifier.fillMaxWidth()) {
@@ -157,27 +166,31 @@ fun TagsRow(
         if (viewModel.popupState) {
             Popup(
                 onDismissRequest = { viewModel.onPopup() },
-                popupPositionProvider = CenterWindowOffsetPositionProvider(),
+                popupPositionProvider = CenterWindowOffsetPositionProvider(y = -170),
             ) {
                 Surface(
-                    modifier = modifier.padding(8.dp),
                     shape = RoundedCornerShape(32.dp),
-                    color = Color(0xCCEEEEEE),
+                    color = MaterialTheme.colorScheme.surfaceVariant.copy(0.9f),
                     shadowElevation = 4.dp
                 ) {
                     FlowRow(
-                        horizontalArrangement = Arrangement.Start
+                        modifier = modifier.padding(8.dp),
+                        horizontalArrangement = Arrangement.Center
                     ) {
                         val selectedTags = viewModel.selectedTags
-                        enumValues<LocationTags>().forEach { tag ->
+                        enumValues<SensoryTags>().forEach { tag ->
                             val color =
-                                if (selectedTags[tag] == true) Color.Green else Color.Blue
+                                if (selectedTags[tag] == true) MaterialTheme.colorScheme.tertiary
+                                else MaterialTheme.colorScheme.tertiaryContainer
                             Button(
                                 modifier = modifier.padding(
                                     horizontal = 4.dp,
                                     vertical = 2.dp
                                 ),
-                                colors = ButtonDefaults.buttonColors(containerColor = color),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = color,
+                                    contentColor = MaterialTheme.colorScheme.onTertiaryContainer
+                                ),
                                 onClick = { viewModel.onTagSelect(tag) }
                             ) {
                                 Text(text = tag.toString())
@@ -211,11 +224,11 @@ fun RecordButton(
     viewModel: AddReviewViewModel = hiltViewModel(),
     @DrawableRes iconRes: Int,
     @StringRes iconDesc: Int,
+    context: Context,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) {
     Log.i("IR", "${viewModel.isRecorded}")
     if (!viewModel.isRecorded) {
-        val context = LocalContext.current
         val permissions =
             arrayOf(Manifest.permission.RECORD_AUDIO, Manifest.permission.READ_MEDIA_AUDIO)
         val launcher =
@@ -225,12 +238,12 @@ fun RecordButton(
                     Log.i("AddReviewContentScreen", "permission granted")
                 } else {
                     Log.i("AddReviewContentScreen", "permission denied")
-                }
+                } // TODO: Ask for mic perm as screen opens
             }
         val isPressed by interactionSource.collectIsPressedAsState()
         val color = if (isPressed) Color.Red else Color.Transparent
         if (isPressed) {
-            viewModel.checkAndRequestPermission(context, permissions, launcher)
+            viewModel.getPermissions(context, permissions, launcher)
         } else {
             viewModel.stopRecording()
         }

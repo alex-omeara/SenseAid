@@ -3,10 +3,12 @@ package com.app.senseaid.model.repository.impl
 import android.util.Log
 import com.app.senseaid.model.CategoryTags
 import com.app.senseaid.model.Location
-import com.app.senseaid.model.LocationTags
+import com.app.senseaid.model.SensoryTags
 import com.app.senseaid.model.Review
 import com.app.senseaid.model.repository.FirestoreRepository
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.GeoPoint
 import com.google.firebase.firestore.Query.Direction
 import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.ktx.snapshots
@@ -33,7 +35,7 @@ class FirestoreRepositoryImpl @Inject constructor(
 
     override fun getLocationCategory(
         tag: CategoryTags,
-        filters: List<LocationTags>
+        filters: List<SensoryTags>
     ): Flow<List<Location>> {
         if (filters.isNotEmpty()) {
             Log.i("getLocationCategory", filters[0].name)
@@ -65,34 +67,6 @@ class FirestoreRepositoryImpl @Inject constructor(
         )
     }
 
-    override fun searchLocations(queryText: String): Flow<List<Location>> {
-        return firestore.collection(LOCATIONS_COLLECTION).orderBy("avgRating", Direction.DESCENDING)
-            .snapshots()
-            .map { snapshot ->
-                snapshot.toObjects<Location>().filter { it.category == CategoryTags.CAFE }
-            }
-    }
-
-//    override suspend fun searchLocations(
-//        queryText: String,
-//        tag: CategoryTags,
-//        filters: List<LocationTags>
-//    ): Flow<List<Location>> {
-//        return firestore.collection(LOCATIONS_COLLECTION).orderBy("avgRating", Direction.DESCENDING)
-//            .snapshots()
-//            .map { snapshot ->
-//                var categorisedList = snapshot.toObjects<Location>().filter { it.category == tag }
-//                if (filters.isNotEmpty()) {
-//                    categorisedList = categorisedList.filter {
-//                        filters.contains(it.top_tags[0]) || filters.contains(it.top_tags[1])
-//                    }
-//                }
-//                categorisedList = categorisedList.filter { it.title.contains(Regex("^$queryText", RegexOption.IGNORE_CASE)) }
-//                categorisedList
-//            }
-//    }
-
-
     override suspend fun addLocation(
         title: String,
         img: String,
@@ -105,7 +79,8 @@ class FirestoreRepositoryImpl @Inject constructor(
                 id = locationId,
                 title = title,
                 imgPath = img,
-                imgDesc = imgDescription
+                imgDesc = imgDescription,
+                coordinates = GeoPoint(0.0,0.0)
             )
             FirebaseFirestore.getInstance().collection("locations").document(locationId)
                 .set(location).await()
@@ -150,7 +125,8 @@ class FirestoreRepositoryImpl @Inject constructor(
                 "rating" to rating,
                 "tags" to tags,
                 "content" to content,
-                "sound_recording" to "/audio/${documentReference.id}-sound.mp3"
+                "sound_recording" to "/audio/${documentReference.id}-sound.mp3",
+                "timestamp" to FieldValue.serverTimestamp()
             )
         )
         Log.d(TAG, "review added in locationId: $locationId, added review: ${documentReference.id}")

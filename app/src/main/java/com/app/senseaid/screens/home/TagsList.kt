@@ -10,7 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.app.senseaid.model.LocationTags
+import com.app.senseaid.model.SensoryTags
 
 @Composable
 fun TagsList(
@@ -22,7 +22,7 @@ fun TagsList(
         shadowElevation = 4.dp
     ) {
         Column(modifier = modifier.padding(10.dp)) {
-            enumValues<LocationTags>().forEach { tag ->
+            enumValues<SensoryTags>().forEach { tag ->
                 Text(
                     text = tag.toString(),
                     modifier = modifier.padding(

@@ -1,7 +1,7 @@
 package com.app.senseaid.screens.location
 
+import android.util.Log
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -12,21 +12,18 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.app.senseaid.R
 import com.app.senseaid.common.composable.*
-import com.app.senseaid.model.LocationTags
+import com.app.senseaid.model.SensoryTags
 import com.app.senseaid.model.SortDirection
 import com.app.senseaid.screens.review.ReviewItem
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
@@ -93,15 +90,24 @@ fun LocationScreen(
                 topTags = location.top_tags
             )
             Divider()
-            Box(contentAlignment = Alignment.Center) {
-                SmallTextTitle(
-                    modifier = modifier.clickable(
-                        role = Role.DropdownList,
-                        onClickLabel = stringResource(id = R.string.sort_by)
-                    ) { viewModel.toggleSortReviews() },
-                    text = stringResource(id = R.string.sort_by),
-                    textAlign = TextAlign.End
-                )
+            Box(
+                modifier = modifier.fillMaxWidth().background(MaterialTheme.colorScheme.background),
+                contentAlignment = Alignment.CenterEnd
+            ) {
+//                SmallTextTitle(
+//                    modifier = modifier.clickable(
+//                        role = Role.DropdownList,
+//                        onClickLabel = stringResource(id = R.string.sort_by)
+//                    ) { viewModel.toggleSortReviews() },
+//                    text = stringResource(id = R.string.sort_by),
+//                    textAlign = TextAlign.End
+//                )
+                IconButton(onClick = { viewModel.toggleSortReviews() }) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_baseline_sort_24),
+                        contentDescription = ""
+                    )
+                }
                 DropdownMenu(
                     expanded = viewModel.isSorting,
                     onDismissRequest = { viewModel.toggleSortReviews() },
@@ -125,13 +131,17 @@ fun LocationScreen(
             LaunchedEffect(key1 = reviews.value.firstOrNull()) { listState.scrollToItem(0) }
             LazyColumn(
                 modifier = modifier
-                    .background(MaterialTheme.colorScheme.primaryContainer)
-                    .padding(horizontal = 10.dp), state = listState
+                    .background(MaterialTheme.colorScheme.background)
+                    .padding(horizontal = 10.dp),
+                state = listState
             ) {
                 items(
                     items = reviews.value,
                     key = { it.id }
                 ) { reviewItem ->
+                    if (reviewItem.id == "oXIFgDsFJ1n70beNUE3j") {
+                        Log.i("ReviewItem", reviewItem.timestamp.toString())
+                    }
                     ReviewItem(
                         review = reviewItem,
                         context = LocalContext.current
@@ -153,7 +163,7 @@ fun RatingInfo(
     modifier: Modifier = Modifier,
     averageRating: Double,
     totalReviews: Int,
-    topTags: List<LocationTags>
+    topTags: List<SensoryTags>
 ) {
     Row(
         modifier = modifier
@@ -191,14 +201,4 @@ fun RatingInfo(
 
     }
 
-}
-
-@Preview
-@Composable
-fun RatingbarPreview() {
-    RatingInfo(
-        averageRating = 3.2,
-        totalReviews = 14,
-        topTags = listOf(LocationTags.ASD_FRIENDLY, LocationTags.LOW_LIGHTS)
-    )
 }

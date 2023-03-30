@@ -18,6 +18,7 @@ import com.app.senseaid.screens.SenseAidViewModel
 import com.google.firebase.firestore.Query.Direction
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 
@@ -65,28 +66,5 @@ class LocationViewModel @Inject constructor(
 
     fun onAddReview(location: Location, navToScreen: (String) -> Unit) {
         navToScreen("${ADD_REVIEW_SCREEN}/{${location.id}}/{${location.totalReviews}}/{${location.avgRating}}")
-    }
-
-    fun startPlaying(context: Context, filePath: String) {
-        Log.i("MediaPlayer", "filePath: $filePath")
-        storageRepository.getFileDownloadUri(filePath).addOnSuccessListener {
-            var mediaPlayer = MediaPlayer().apply {
-//                setAudioAttributes(
-//                    AudioAttributes.Builder()
-//                        .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
-//                        .setUsage(AudioAttributes.USAGE_MEDIA)
-//                        .build()
-//                )
-                Log.i("MediaPlayer", "url: $it")
-                setDataSource(context, it)
-                prepare()
-                start()
-            }
-        }
-    }
-
-    fun startPlayingLocalFile(context: Context, file: Int) {
-        val m = MediaPlayer.create(context, file)
-        m.start()
     }
 }

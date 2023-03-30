@@ -76,6 +76,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-firestore-ktx'
     implementation 'com.google.firebase:firebase-storage-ktx'
     implementation 'com.firebaseui:firebase-ui-storage:8.0.2'
+    implementation 'com.firebase:geofire-android-common:3.2.0'
     // Glide
     implementation 'com.github.bumptech.glide:glide:4.14.2'
     kapt 'com.github.bumptech.glide:compiler:4.14.2'
@@ -92,6 +93,8 @@ dependencies {
     implementation 'io.github.a914-gowtham:compose-ratingbar:1.2.3'
     // FlowRow (soon to be deprecated when compose releases flow rows)
     implementation "com.google.accompanist:accompanist-flowlayout:0.29.0-alpha"
+    // Google Play services locations
+    implementation 'com.google.android.gms:play-services-location:21.0.1'
 }
 
 kapt {

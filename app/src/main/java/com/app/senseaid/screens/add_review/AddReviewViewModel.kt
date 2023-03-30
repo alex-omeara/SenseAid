@@ -1,20 +1,18 @@
 package com.app.senseaid.screens.add_review
 
 import android.content.Context
-import android.content.pm.PackageManager
 import android.media.MediaRecorder
 import android.media.MediaRecorder.OutputFormat
 import android.net.Uri
 import android.os.CountDownTimer
-import android.os.Environment
 import android.util.Log
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.core.content.ContextCompat
-import com.app.senseaid.model.LocationTags
+import com.app.senseaid.model.FileType
+import com.app.senseaid.model.SensoryTags
 import com.app.senseaid.model.repository.FirestoreRepository
 import com.app.senseaid.screens.SenseAidViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -40,12 +38,9 @@ class AddReviewViewModel @Inject constructor(
     var charsAdded by mutableStateOf(0)
         private set
 
-    val selectedTags = mutableStateMapOf<LocationTags, Boolean>()
+    val selectedTags = mutableStateMapOf<SensoryTags, Boolean>()
 
     var popupState by mutableStateOf(false)
-        private set
-
-    var sound: Uri? by mutableStateOf(Uri.EMPTY)
         private set
 
     var recordTime by mutableStateOf(0L)
@@ -56,6 +51,7 @@ class AddReviewViewModel @Inject constructor(
             Log.i(TAG, (millisUntilFinished / COUNTER_STEP).toString())
             recordTime = ((RECORD_LIMIT - millisUntilFinished) + 1000) / COUNTER_STEP
         }
+
         override fun onFinish() {
             Log.i(TAG, "timer finished")
             stopRecording()
@@ -66,11 +62,13 @@ class AddReviewViewModel @Inject constructor(
     var isRecorded by mutableStateOf(false)
         private set
 
+    private var filePath: Uri? = null
     private var fileName: String? = null
 
-    fun setSoundUri(uri: Uri) {
-        sound = uri
-        Log.i("set sound", uri.toString())
+    fun setUploadedFile(file: Uri, context: Context) {
+        filePath = file
+        fileName = getFileName(file, context)
+        Log.i("", "name: $fileName, path: $filePath")
     }
 
     fun onPopup() {
@@ -103,7 +101,7 @@ class AddReviewViewModel @Inject constructor(
     ) {
         launchCatching {
             val formattedLocationId = locationId.substring(1, locationId.length - 1)
-            val formattedTotalRatings = totalRatings.substring(1, totalRatings.length - 3).toInt()
+            val formattedTotalRatings = totalRatings.substring(1, totalRatings.length - 1).toInt()
             val reviewId = firestoreRepository.addReview(
                 author = author,
                 rating = rating.toDouble(),
@@ -111,9 +109,14 @@ class AddReviewViewModel @Inject constructor(
                 content = reviewContentText,
                 locationId = formattedLocationId,
             )
-            fileName?.let {
-                storageRepository.addSoundFile(it, reviewId)
+            if (filePath != null && fileName != null) {
+                Log.i("AddReviewViewModel", filePath!!.toString())
+                storageRepository.uploadFile(filePath!!, reviewId, FileType.AUDIO, fileName!!)
             }
+//            filePath?.let {
+//                Log.i("AddReviewViewModel", filePath!!.toString())
+//                storageRepository.uploadFile(it, reviewId, FileType.AUDIO, fileName!!)
+//            }
             firestoreRepository.updateLocationField(
                 locationId = formattedLocationId,
                 field = "avgRating",
@@ -132,7 +135,7 @@ class AddReviewViewModel @Inject constructor(
         navToScreen()
     }
 
-    fun onTagSelect(tag: LocationTags) {
+    fun onTagSelect(tag: SensoryTags) {
         selectedTags[tag] = selectedTags[tag] == false || selectedTags[tag] == null
         Log.d(TAG, "$tag : ${selectedTags[tag]}")
     }
@@ -152,22 +155,14 @@ class AddReviewViewModel @Inject constructor(
         isRecorded = !isRecorded
     }
 
-    fun checkAndRequestPermission(
+    fun getPermissions(
         context: Context,
         permissions: Array<String>,
         launcher: ManagedActivityResultLauncher<Array<String>, Map<String, Boolean>>
     ) {
-        if (permissions.all {
-                ContextCompat.checkSelfPermission(
-                    context,
-                    it
-                ) == PackageManager.PERMISSION_GRANTED
-            }) {
-            fileName = "${context.getExternalFilesDir(Environment.DIRECTORY_RECORDINGS)}/sound.mp3"
-            Log.i(TAG, "started recording")
+        if (checkAndRequestPermission(context, permissions, launcher)) {
+            filePath = Uri.parse("${context.cacheDir}/sound.mp3")
             startRecording(context)
-        } else {
-            launcher.launch(permissions)
         }
     }
 
@@ -176,7 +171,7 @@ class AddReviewViewModel @Inject constructor(
             recorder = MediaRecorder(context).apply {
                 setAudioSource(MediaRecorder.AudioSource.MIC)
                 setOutputFormat(OutputFormat.AAC_ADTS)
-                setOutputFile(fileName)
+                setOutputFile(filePath.toString())
                 setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
                 prepare()
                 start()
@@ -199,6 +194,7 @@ class AddReviewViewModel @Inject constructor(
                 timer.cancel()
                 onRecorded()
                 Log.i(TAG, "recording stopped")
+                Log.i(TAG, "file recorded at $filePath")
             }
         } catch (e: IllegalStateException) {
             Log.e(TAG, "failed to stop recording: ${e.stackTraceToString()}")
