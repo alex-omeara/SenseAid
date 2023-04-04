@@ -73,12 +73,17 @@ fun ReviewItem(
                 val soundFileName = viewModel.getFileName(Uri.parse(review.sound_recording), context, false)
                 AudioPlayer(
                     modifier = modifier,
-                    checked = (viewModel.isPlaying && !viewModel.isPaused),
-                    onCheckedChange = {
-                        if (it) viewModel.startPlayer(context, "/audio/${review.id}-$soundFileName")
-                        else viewModel.pausePlayer()
+                    checked = (viewModel.isPlaying && !viewModel.isPaused)
+                ) {
+                    if (it) {
+                        if (soundFileName!!.contains("loud") || soundFileName.contains("quiet")) {
+                            viewModel.startPlayer(context, "/audio/$soundFileName")
+                        } else {
+                            viewModel.startPlayer(context, "/audio/${review.id}-$soundFileName")
+                        }
                     }
-                )
+                    else viewModel.pausePlayer()
+                }
             }
         }
 

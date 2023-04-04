@@ -113,10 +113,6 @@ class AddReviewViewModel @Inject constructor(
                 Log.i("AddReviewViewModel", filePath!!.toString())
                 storageRepository.uploadFile(filePath!!, reviewId, FileType.AUDIO, fileName!!)
             }
-//            filePath?.let {
-//                Log.i("AddReviewViewModel", filePath!!.toString())
-//                storageRepository.uploadFile(it, reviewId, FileType.AUDIO, fileName!!)
-//            }
             firestoreRepository.updateLocationField(
                 locationId = formattedLocationId,
                 field = "avgRating",

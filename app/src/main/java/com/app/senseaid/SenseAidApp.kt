@@ -67,12 +67,6 @@ fun SenseAidApp() {
     }
 }
 
-@Composable
-fun rememberAppState(
-    navController: NavHostController = rememberNavController(),
-    coroutineScope: CoroutineScope = rememberCoroutineScope()
-) = remember(navController, coroutineScope) { SenseAidAppState(navController, coroutineScope) }
-
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 fun NavGraphBuilder.senseAidGraph(navController: NavHostController) {
     composable(HOME_SCREEN) {

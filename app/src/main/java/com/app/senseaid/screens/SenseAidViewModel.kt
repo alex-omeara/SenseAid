@@ -99,7 +99,7 @@ abstract class SenseAidViewModel : ViewModel() {
     @SuppressLint("Range")
     fun getFileName(file: Uri, context: Context, isLocal: Boolean = true): String? {
         var result: String? = null
-        if (file.scheme == "content" && !isLocal) {
+        if (file.scheme == "content" && isLocal) {
             val cursor = context.contentResolver.query(file, null, null, null)
             cursor.use { c ->
                 c?.moveToFirst()
