@@ -36,7 +36,6 @@ abstract class SenseAidViewModel : ViewModel() {
     var isPaused by mutableStateOf(false)
         private set
 
-    // TODO: add proper catching https://github.com/FirebaseExtended/make-it-so-android/blob/55b8504db5dc588dbe82787c4d3abb8be37a94aa/app/src/main/java/com/example/makeitso/screens/MakeItSoViewModel.kt
     fun launchCatching(snackbar: Boolean = false, block: suspend CoroutineScope.() -> Unit) =
         viewModelScope.launch(block = block)
 

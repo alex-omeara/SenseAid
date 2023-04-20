@@ -141,7 +141,6 @@ fun AddReviewContentScreen(
                     )
                 })
             )
-            // TODO: Move to bottom of screen (custom layout not BottomAppBar)
             BasicButton(text = R.string.submit, modifier = modifier.fillMaxWidth()) {
                 viewModel.onSubmit(
                     locationId = locationId,
@@ -238,7 +237,7 @@ fun RecordButton(
                     Log.i("AddReviewContentScreen", "permission granted")
                 } else {
                     Log.i("AddReviewContentScreen", "permission denied")
-                } // TODO: Ask for mic perm as screen opens
+                }
             }
         val isPressed by interactionSource.collectIsPressedAsState()
         val color = if (isPressed) Color.Red else Color.Transparent

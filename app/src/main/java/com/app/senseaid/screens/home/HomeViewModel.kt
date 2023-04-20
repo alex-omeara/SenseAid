@@ -56,7 +56,6 @@ class HomeViewModel @Inject constructor(
                 override fun onLocationResult(p0: LocationResult) {
                     for (loc in p0.locations) {
                         curGeoLocation = GeoLocation(loc.latitude, loc.longitude)
-//                        Log.i("curGeoLocation", curGeoLocation.toString())
                     }
                 }
             }
@@ -67,7 +66,6 @@ class HomeViewModel @Inject constructor(
     fun startLocationUpdates() {
         locationCallback?.let {
             val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 300)
-//                .setMinUpdateIntervalMillis(180000)
                 .build()
             fusedLocationClient?.requestLocationUpdates(
                 locationRequest,
@@ -107,30 +105,5 @@ class HomeViewModel @Inject constructor(
     fun onLocationClick(locationId: String, navToScreen: (String) -> Unit) {
         Log.i("onLocationClick", "navigating")
         navToScreen("${LOCATION_SCREEN}/{${locationId}}")
-    }
-
-    // TODO: Delete or improve
-    fun addData(context: Context) {
-        var json: String? = null
-        try {
-            val inputStream = context.assets.open("mock-reviews.json")
-            json = inputStream.bufferedReader().use { it.readText() }
-        } catch (e: Exception) {
-            Log.w("READ_JSON", e)
-        }
-        val listReview = object : TypeToken<List<Review>>() {}.type
-        val t: List<Review> = Gson().fromJson(json, listReview)
-
-        val c = t.chunked(14)
-        Log.i("REVIEW", t.size.toString())
-
-        Firebase.firestore.collection("locations").get().addOnSuccessListener { querySnapchot ->
-            querySnapchot.documents.forEachIndexed { index, docSnapshot ->
-                val collectionReference = docSnapshot.reference.collection("reviews")
-                for (i in c[index]) {
-                    collectionReference.document().set(i)
-                }
-            }
-        }
     }
 }

@@ -36,10 +36,6 @@ fun BasicButton(
     Button(
         onClick = onClick,
         modifier = modifier,
-//        colors = ButtonDefaults.buttonColors(
-//            containerColor = MaterialTheme.colorScheme.primary,
-//            contentColor = MaterialTheme.colorScheme.onPrimary
-//        ),
         enabled = enabled,
         elevation = ButtonDefaults.buttonElevation(4.dp)
     ) {

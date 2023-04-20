@@ -32,6 +32,4 @@ interface FirestoreRepository {
         content: String,
         locationId: String,
     ): String
-
-    // TODO: Add deleteLocationFromFirestore method using firebase docs to do correctly
 }

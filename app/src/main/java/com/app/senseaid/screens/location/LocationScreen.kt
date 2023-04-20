@@ -94,14 +94,6 @@ fun LocationScreen(
                 modifier = modifier.fillMaxWidth().background(MaterialTheme.colorScheme.background),
                 contentAlignment = Alignment.CenterEnd
             ) {
-//                SmallTextTitle(
-//                    modifier = modifier.clickable(
-//                        role = Role.DropdownList,
-//                        onClickLabel = stringResource(id = R.string.sort_by)
-//                    ) { viewModel.toggleSortReviews() },
-//                    text = stringResource(id = R.string.sort_by),
-//                    textAlign = TextAlign.End
-//                )
                 IconButton(onClick = { viewModel.toggleSortReviews() }) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_baseline_sort_24),
